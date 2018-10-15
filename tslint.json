@@ -20,13 +20,9 @@
     "object-literal-sort-keys": false,
     "no-unused-expression": false,
     "max-classes-per-file": false,
+    "semicolon": [false],
     "no-console": [false, "log", "error"],
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore"
-    ],
+    "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
     "one-line": [false],
     "one-variable-per-declaration": [false]
   },
