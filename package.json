@@ -21,7 +21,7 @@
     "url": "git+https://github.com/CouleeTech/ts-doctest.git"
   },
   "author": "Coulee Tech",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.5",
     "jest": "^23.6.0",
