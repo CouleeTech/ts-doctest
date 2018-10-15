@@ -23,7 +23,9 @@ beforeAll(() => {
 })
 
 describe('AIL Manager', () => {
-  it('Exists', () => {
+  it('Properly consumes ApiResultContainers', () => {
+    const testContainer1 = new RawDocContainer({ controller: 'test' })
+    AilManager.ConsumeContainer(testContainer1)
     expect(AilManager).toBeDefined()
   })
 })

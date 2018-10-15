@@ -20,7 +20,7 @@
     "strictPropertyInitialization": false,
     "target": "es6",
     "typeRoots": ["./node_modules/@types"],
-    "lib": ["es7"]
+    "lib": ["es7", "dom"]
   },
   "include": ["./src/**/*"],
   "exclude": ["index.d.ts", "index.js", "lib", "node_modules", "**/__tests__/*"]
