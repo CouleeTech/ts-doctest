@@ -96,7 +96,7 @@ export abstract class ControllerTestSuite {
       describe(this.controller, async () => {
         beforeAll(async () => {
           this.app = await this.appBuilder()
-          AilManager.EnsureApiResultsDirectory()
+          AilManager.Init()
           await this.beforeAll()
           await this.app.init()
         })
