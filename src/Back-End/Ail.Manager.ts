@@ -30,9 +30,10 @@ export interface IAilManagerConfig {
 export class AilManager {
   private static ALLOWED_ENGINE_TYPES = ['FILE', 'MEMORY']
   private static API_RESULT_DIR = './test/Results'
-  private static CONFIG: IAilManagerConfig | null = null
+  private static CONFIG: IAilManagerConfig
   private static DEFAULT_CONFIG_PATH = './doctest.json'
   private static INITIALIZED = false
+  private static MEMORY_RESULTS: Map<string, IAilJson>
 
   /**
    * This class should never be instantiated
@@ -52,7 +53,7 @@ export class AilManager {
     const { controller, paths } = container.consume()
     this.CreateApiResultFile(controller)
     const ailJson: IAilJson = AilFactory.Create(controller, paths)
-    await this.WriteApiResultFile(controller, ailJson)
+    await this.StoreAilResults(controller, ailJson)
   }
 
   /**
@@ -86,6 +87,8 @@ export class AilManager {
 
     if (this.CONFIG.storageEngine === AilStorageEngineType.FILE) {
       this.EnsureApiResultsDirectory()
+    } else if (this.CONFIG.storageEngine === AilStorageEngineType.MEMORY) {
+      this.MEMORY_RESULTS = new Map<string, IAilJson>()
     }
   }
 
@@ -161,6 +164,24 @@ export class AilManager {
    */
   private static GetResultFilePath(controller: string) {
     return `${this.API_RESULT_DIR}/${controller}.ail.json`
+  }
+
+  /**
+   * Store the AIL object depending on the configured storage engine
+   *
+   * @param controller The name of the controller the results belong to
+   * @param ailJson The AIL JSON object
+   */
+  private static StoreAilResults(controller: string, ailJson: IAilJson) {
+    const { storageEngine } = this.CONFIG as IAilManagerConfig
+    switch (storageEngine) {
+      case AilStorageEngineType.FILE:
+        this.WriteApiResultFile(controller, ailJson)
+        break
+      case AilStorageEngineType.MEMORY:
+        this.MEMORY_RESULTS.set(controller, ailJson)
+        break
+    }
   }
 
   /**

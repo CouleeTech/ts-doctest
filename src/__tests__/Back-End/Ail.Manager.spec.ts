@@ -2,6 +2,10 @@ import { AilManager, AilStorageEngineType } from '../../Back-End/Ail.Manager'
 import { RawDocContainer } from '../../Common'
 
 beforeAll(() => {
+  it('Should not accept an invalid storage engine', () => {
+    expect(AilManager.Init({ storageEngine: 'foobar' as AilStorageEngineType })).toThrow(Error)
+  })
+
   it('Should not accept a filesystem storage engine during testing', () => {
     expect(AilManager.Init({ storageEngine: AilStorageEngineType.FILE })).toThrow(Error)
   })
