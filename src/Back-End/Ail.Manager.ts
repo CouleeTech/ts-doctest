@@ -11,7 +11,8 @@ import { AilFactory, IAilJson } from './Ail.Factory'
  * to generate intermediate files that can be converted to documentation.
  */
 export class AilManager {
-  private static readonly API_RESULT_DIR = './test/Utils/DocTest/Results'
+  // TODO : Make this configurable
+  private static readonly API_RESULT_DIR = './test/Results'
 
   /**
    * This class should never be instantiated
