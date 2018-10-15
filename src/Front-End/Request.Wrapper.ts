@@ -18,7 +18,7 @@ export type DynamicParameter<T> = T | string
 /**
  * Combines documentation functionality with the testing facilities provided by supertest's request object
  */
-export default class RequestWrapper {
+export class RequestWrapper {
   private readonly path: any
   private readonly request: any
   private requestBody?: IRequestBody

@@ -14,7 +14,7 @@ export interface IContainerContents {
 /**
  * Used to hold a controller's raw API documentation data
  */
-export default class RawDocContainer {
+export class RawDocContainer {
   private readonly controller: string
   private readonly description?: string
   private data: Map<string, Set<RawDocData>>

@@ -1,13 +1,13 @@
 import * as supertest from 'supertest'
 import { Response } from 'superagent'
 
-import ApiResultContainer from '../Common/RawDocs.Container'
+import { RawDocContainer } from '../Common/RawDocs.Container'
 import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http.Types'
 import { RawDocData } from '../Common/RawDocs.Interface'
 
 import { IApplication } from './Application.Interface'
-import RequestWrapper from './Request.Wrapper'
-import ApiResults from '../Back-End/Ail.Manager'
+import { RequestWrapper } from './Request.Wrapper'
+import { AilManager } from '../Back-End/Ail.Manager'
 
 export interface ITestSuiteInfo {
   controller: string
@@ -47,12 +47,12 @@ export interface IOperationConfig {
  * only ever be one test suite per controller. Use this class by extending it and implementing its abstract methods.
  * To initiate the test suite create a trigger function using the `build` method.
  */
-export default abstract class ControllerTestSuite {
+export abstract class ControllerTestSuite {
   private app: IApplication
   private appBuilder: () => Promise<IApplication>
   private controller: string
   private paths: Map<string, TestSuitePath>
-  private resultContainer: ApiResultContainer
+  private resultContainer: RawDocContainer
   private requestWrappers: Set<RequestWrapper>
 
   /**
@@ -62,7 +62,7 @@ export default abstract class ControllerTestSuite {
     this.setAppBuilder(config.appBuilder)
     this.controller = config.info.controller
     this.paths = new Map<string, TestSuitePath>()
-    this.resultContainer = new ApiResultContainer(config.info)
+    this.resultContainer = new RawDocContainer(config.info)
     this.requestWrappers = new Set<RequestWrapper>()
   }
 
@@ -96,7 +96,7 @@ export default abstract class ControllerTestSuite {
       describe(this.controller, async () => {
         beforeAll(async () => {
           this.app = await this.appBuilder()
-          ApiResults.EnsureApiResultsDirectory()
+          AilManager.EnsureApiResultsDirectory()
           await this.beforeAll()
           await this.app.init()
         })
@@ -168,7 +168,7 @@ export default abstract class ControllerTestSuite {
             console.log(this.path.name)
             this.resultContainer.save(rawDocs)
           }
-          await ApiResults.ConsumeContainer(this.resultContainer)
+          await AilManager.ConsumeContainer(this.resultContainer)
         })
       })
   }

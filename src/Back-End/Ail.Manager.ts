@@ -1,8 +1,8 @@
 import * as fs from 'fs'
 
-import ApiResultContainer from '../Common/RawDocs.Container'
+import { RawDocContainer } from '../Common/RawDocs.Container'
 
-import AilFactory, { IAilJson } from './Ail.Factory'
+import { AilFactory, IAilJson } from './Ail.Factory'
 
 /**
  * The primary interface to the back-end used to convert raw API doc data into AIL files
@@ -10,7 +10,7 @@ import AilFactory, { IAilJson } from './Ail.Factory'
  * Raw API documentation data is stored in formatted JSON files. These files are used
  * to generate intermediate files that can be converted to documentation.
  */
-export default class AilManager {
+export class AilManager {
   private static readonly API_RESULT_DIR = './test/Utils/DocTest/Results'
 
   /**
@@ -21,7 +21,7 @@ export default class AilManager {
   /**
    * Consumes an ApiResultContainer and writes its data into the results directory
    */
-  public static async ConsumeContainer(container: ApiResultContainer) {
+  public static async ConsumeContainer(container: RawDocContainer) {
     const { controller, paths } = container.consume()
     this.CreateApiResultFile(controller)
     const ailJson: IAilJson = AilFactory.Create(controller, paths)

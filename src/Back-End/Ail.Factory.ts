@@ -29,7 +29,7 @@ export interface IAilRoute {
 /**
  * Used to create AIL JSON objects
  */
-export default class AilFactory {
+export class AilFactory {
   private static readonly AIL_VERSION = 0.1
 
   /**
