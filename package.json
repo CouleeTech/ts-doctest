@@ -24,6 +24,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.5",
+    "@types/superagent": "^3.8.4",
+    "@types/supertest": "^2.0.6",
     "jest": "^23.6.0",
     "prettier": "^1.14.3",
     "ts-jest": "^23.10.4",
