@@ -12,6 +12,7 @@ import {
   IResponseStatusOptions,
   RawDocData,
 } from '../Common/RawDocs.Interface'
+import { IsString } from '../Common/Validation/TypeChecks'
 
 export type DynamicParameter<T> = T | string
 
@@ -198,13 +199,4 @@ export class RequestWrapper {
     const result = { req, res: { body, headers: header, ...everythingElse } }
     return result
   }
-}
-
-/**
- * Check to see if a value is a string
- *
- * @param value The value to be checked
- */
-function IsString(value: any) {
-  return typeof value === 'string' || value instanceof String
 }

@@ -19,7 +19,8 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "target": "es6",
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es7"]
   },
   "include": ["./src/**/*"],
   "exclude": ["index.d.ts", "index.js", "lib", "node_modules", "**/__tests__/*"]
