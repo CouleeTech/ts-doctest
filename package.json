@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zahfox/not-a-real-repo.git"
+    "url": "git+https://github.com/CouleeTech/ts-doctest.git"
   },
   "author": "Coulee Tech",
   "license": "ISC",
