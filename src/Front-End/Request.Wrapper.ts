@@ -87,7 +87,7 @@ export class RequestWrapper {
       this.requestBody = { data: body }
     }
 
-    this.request.set(body as any)
+    this.request.send(body as any)
     return this
   }
 
