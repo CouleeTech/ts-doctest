@@ -4,7 +4,6 @@ export interface IRequestHeaderOptions {
 }
 
 export interface IRequestHeader extends IRequestHeaderOptions {
-  name: string
   value: any
 }
 
@@ -23,7 +22,6 @@ export interface IResponseHeaderOptions {
 }
 
 export interface IResponseHeader extends IResponseHeaderOptions {
-  name: string
   value: any
 }
 
@@ -45,6 +43,14 @@ export interface IResponseStatus extends IResponseStatusOptions {
   code: number
 }
 
+export interface IRequestHeaders {
+  [name: string]: IRequestHeader
+}
+
+export interface IResponseHeaders {
+  [name: string]: IResponseHeader
+}
+
 // Results
 
 export interface IResults {
@@ -55,9 +61,9 @@ export interface IResults {
 export type RawDocData = Partial<{
   path: string
   requestBody: IRequestBody
-  requestHeaders: IRequestHeader[]
+  requestHeaders: IRequestHeaders
   responseBody: IResponseBody
-  responseHeaders: IResponseHeader[]
+  responseHeaders: IResponseHeaders
   responseStatus: IResponseStatus
   results: IResults
 }>

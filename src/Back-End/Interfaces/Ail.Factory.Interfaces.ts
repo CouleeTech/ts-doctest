@@ -3,6 +3,10 @@ import { IHttpRequestHeader, HttpRequestMethod } from '../../Common/Http.Types'
 
 export const pathOperations = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
 
+/* Constant Strings */
+
+export const NO_DESCRIPTION_PROVIDED = 'No description provided'
+
 export interface IOperationObjectCollection {
   [path: string]: OperationObject[]
 }

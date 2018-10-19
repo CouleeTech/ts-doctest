@@ -1,8 +1,8 @@
-import { OperationObject, PathsObject, PathItemObject } from 'openapi3-ts'
+import { OperationObject, PathsObject, PathItemObject, ResponseObject } from 'openapi3-ts'
 
 import { ContainerPaths } from '../Common/RawDocs.Container'
 import { RawDocData } from '../Common/RawDocs.Interface'
-import { IAilJson, IOperationObjectCollection } from './Interfaces/Ail.Factory.Interfaces'
+import { IAilJson, IOperationObjectCollection, NO_DESCRIPTION_PROVIDED } from './Interfaces/Ail.Factory.Interfaces'
 import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
 import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
 import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
@@ -77,13 +77,51 @@ export class AilFactory {
       }
 
       const operationType: OperationObject = {
-        responses: [],
+        responses: [
+          {
+            [value.results!.res.status]: this.ResponseObjectFromRawData(value),
+          },
+        ],
       }
 
       operations[type].push(operationType)
     }
 
     return operations
+  }
+
+  /**
+   * Convert a raw response object into AIL JSON
+   *
+   * @param res The raw result's respose object
+   * @param responseBody The optional user supplied response body data
+   */
+  protected static ResponseObjectFromRawData(value: any): ResponseObject {
+    const responseObject: ResponseObject = value.responseBody
+      ? { description: value.responseBody.description ? value.responseBody.description : NO_DESCRIPTION_PROVIDED }
+      : { description: NO_DESCRIPTION_PROVIDED }
+
+    responseObject.headers = {}
+    const hasResponseHeaders = !!value.responseHeaders
+
+    for (const header of Object.keys(value.res.headers)) {
+      responseObject.headers[header] =
+        hasResponseHeaders && value.responseHeaders[header]
+          ? value.responseHeaders[header].description
+            ? {
+                required: true,
+                description: value.responseHeaders[header].description,
+                value: value.res.headers[header],
+              }
+            : { required: true, value: value.res.headers[header] }
+          : { required: true, value: value.res.headers[header] }
+    }
+
+    if (value.res.body) {
+      responseObject.content = { 'application/json': { example: { ...value.res.body } } }
+    }
+
+    return responseObject
   }
 
   /**

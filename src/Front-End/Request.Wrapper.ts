@@ -1,9 +1,7 @@
 import {
   IResponseBody,
   IRequestBody,
-  IResponseHeader,
   IResponseStatus,
-  IRequestHeader,
   IResults,
   IRequestHeaderOptions,
   IRequestBodyOptions,
@@ -16,6 +14,11 @@ import { IsString } from '../Common/Validation/TypeChecks'
 
 export type DynamicParameter<T> = T | string
 
+export interface IHeaderStorage extends IRequestHeaderOptions {
+  name: string
+  value: any
+}
+
 /**
  * Combines documentation functionality with the testing facilities provided by supertest's request object
  */
@@ -23,9 +26,9 @@ export class RequestWrapper {
   private readonly path: any
   private readonly request: any
   private requestBody?: IRequestBody
-  private requestHeaders: Set<IRequestHeader>
+  private requestHeaders: Set<IHeaderStorage>
   private responseBody?: IResponseBody
-  private responseHeaders: Set<IResponseHeader>
+  private responseHeaders: Set<IHeaderStorage>
   private responseStatus?: IResponseStatus
   private results?: IResults
 
@@ -37,8 +40,8 @@ export class RequestWrapper {
     this.path = path
     this.request = req
     req.expect((res: any) => (this.results = RequestWrapper.ParseRawResponse(res)))
-    this.requestHeaders = new Set<IRequestHeader>()
-    this.responseHeaders = new Set<IResponseHeader>()
+    this.requestHeaders = new Set<IHeaderStorage>()
+    this.responseHeaders = new Set<IHeaderStorage>()
   }
 
   /**
@@ -55,7 +58,7 @@ export class RequestWrapper {
    * @param value The value of the header
    * @param options Additional configuration options
    */
-  public setHeader(name: string, value: any, options?: DynamicParameter<IRequestHeaderOptions>) {
+  public setHeader(name: string, value: any, options?: DynamicParameter<IHeaderStorage>) {
     if (options) {
       if (IsString(options)) {
         this.requestHeaders.add({ name, value, description: options as string })
@@ -162,11 +165,21 @@ export class RequestWrapper {
     const docs: RawDocData = { path: this.path, results: this.results }
 
     if (this.requestHeaders.size > 0) {
-      docs.requestHeaders = Array.from(this.requestHeaders)
+      docs.requestHeaders = {}
+
+      for (const reqHeader of this.requestHeaders.values()) {
+        const { name, value, ...options } = reqHeader
+        docs.requestHeaders[name] = { value, ...options }
+      }
     }
 
     if (this.responseHeaders.size > 0) {
-      docs.responseHeaders = Array.from(this.responseHeaders)
+      docs.responseHeaders = {}
+
+      for (const resHeader of this.responseHeaders.values()) {
+        const { name, value, ...options } = resHeader
+        docs.responseHeaders[name] = { value, ...options }
+      }
     }
 
     if (this.requestBody) {
