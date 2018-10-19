@@ -3,7 +3,8 @@ import * as fs from 'fs'
 import { IsObject, IsString } from '../Common'
 import { RawDocContainer } from '../Common/RawDocs.Container'
 
-import { AilFactory, IAilJson } from './Ail.Factory'
+import { AilFactory } from './Ail.Factory'
+import { IAilJson } from './Interfaces/Ail.Factory.Interfaces'
 
 /**
  * The storage engine used for AIL objects

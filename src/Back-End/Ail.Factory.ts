@@ -2,39 +2,7 @@ import { OperationObject, PathsObject, PathItemObject } from 'openapi3-ts'
 
 import { ContainerPaths } from '../Common/RawDocs.Container'
 import { RawDocData } from '../Common/RawDocs.Interface'
-import { IHttpRequestHeader, HttpRequestMethod } from '../Common/Http.Types'
-
-export const pathOperations = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
-export interface IOperationObjectCollection {
-  [path: string]: OperationObject
-}
-
-export interface IAilJson {
-  ailVersion: string
-  dateCreated: number
-  openApiVersion: string
-  controller: string
-  paths: PathsObject[]
-}
-
-export interface IAilRequest {
-  headers: IHttpRequestHeader[]
-  body?: any
-}
-
-export interface IAilResponse {
-  headers: IHttpRequestHeader[]
-  body: any
-  status: number
-}
-
-export interface IAilRoute {
-  method: HttpRequestMethod
-  route: string
-  title: string
-  request: IAilRequest
-  response: IAilResponse
-}
+import { IAilJson, IOperationObjectCollection } from './Interfaces/Ail.Factory.Interfaces'
 
 /**
  * Used to create AIL JSON objects
@@ -66,6 +34,12 @@ export class AilFactory {
     return ailJson
   }
 
+  /**
+   * Convert the raw path data into an AIL Paths Object
+   *
+   * @param path The name of the path
+   * @param rawData Raw data associated with the path and its operations
+   */
   protected static RawPathToAil(path: string, rawData: RawDocData[]): PathsObject {
     const pathAilItem: PathItemObject = {
       ...this.RawOperationsToAil(rawData),
@@ -78,17 +52,31 @@ export class AilFactory {
     return pathAil
   }
 
+  /**
+   * Convert the raw path operations into an object with keys containing OperationObjects
+   *
+   * If multiple operations of the same HTTP verb are included in one path, the first occurrence's
+   * meta data will take precedence over all remaining occurrences. This includes properties except
+   * for responses.
+   *
+   * @param rawData Raw data associated with the path and its operations
+   */
   protected static RawOperationsToAil(rawData: RawDocData[]): IOperationObjectCollection {
     const operations: IOperationObjectCollection = {}
 
     for (const value of rawData) {
       const type = value.results!.req.method.toLowerCase()
+
       if (!operations[type]) {
-        operations[type] = {
-          description: 'tests',
-          responses: [],
-        }
+        const operationObjectArray: OperationObject[] = []
+        operations[type] = operationObjectArray
       }
+
+      const operationType: OperationObject = {
+        responses: [],
+      }
+
+      operations[type].push(operationType)
     }
 
     return operations
