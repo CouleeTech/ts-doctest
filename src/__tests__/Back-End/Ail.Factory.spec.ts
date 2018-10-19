@@ -2,9 +2,14 @@ import { PathsObject, PathItemObject } from 'openapi3-ts'
 
 import { AilFactory } from '../../Back-End/Ail.Factory'
 import { RawDocData } from '../../Common'
+import { AilFactoryException } from '../../Back-End/Exceptions/Ail.Factory.Exception'
+
+import { invalidRawData, validRawData } from '../Payloads/RawApi.Payloads'
 
 class MockAilFactory extends AilFactory {
   public static rawToAil = (path: string, rawData: RawDocData[]) => MockAilFactory.RawPathToAil(path, rawData)
+  public static validateRawDataInTest = (path: string, rawData: RawDocData[]) =>
+    MockAilFactory.ValidateRawData(path, rawData)
 }
 
 interface IRawData {
@@ -34,6 +39,22 @@ describe('AIL Factory', () => {
     const { path, rawData } = mockRawData
     const pathObject: PathsObject = MockAilFactory.rawToAil(path, rawData)
     validatePathsObject(path, pathObject)
+  })
+
+  it('ValidateRawData should throw exceptions for invalid data', () => {
+    const path = 'TEST'
+    const trials = invalidRawData()
+    for (const trial of trials) {
+      expect(() => MockAilFactory.validateRawDataInTest(path, trial as any)).toThrow(AilFactoryException)
+    }
+  })
+
+  it('ValidateRawData should not throw exceptions for valid data', () => {
+    const path = 'TEST'
+    const trials = validRawData()
+    for (const trial of trials) {
+      expect(() => MockAilFactory.validateRawDataInTest(path, trial as any))
+    }
   })
 })
 

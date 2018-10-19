@@ -1,0 +1,35 @@
+export const validRawData = () => [
+  [{ results: { req: { method: 'test', headers: 'test', url: 'test' }, res: { headers: 'test', status: 'test' } } }],
+  [
+    { results: { req: { method: 'test', headers: 'test', url: 'test' }, res: { headers: 'test', status: 'test' } } },
+    { results: { req: { method: 'test', headers: 'test', url: 'test' }, res: { headers: 'test', status: 'test' } } },
+    { results: { req: { method: 'test', headers: 'test', url: 'test' }, res: { headers: 'test', status: 'test' } } },
+  ],
+]
+
+export const invalidRawData = () => [
+  [],
+  {},
+  null,
+  undefined,
+  'test',
+  42,
+  [{ results: [] }],
+  [{ results: {} }],
+  [{ results: { req: [] } }],
+  [{ req: { method: 'test' } }],
+  [{ results: { req: { method: 'test' } } }],
+  { results: { req: { url: 'test' } } },
+  [{ results: { req: { headers: 'test' } } }],
+  [{ results: { req: { method: 'test', headers: 'test' } } }],
+  [{ results: { req: { method: 'test', url: 'test' } } }],
+  [{ results: { req: { headers: 'test', url: 'test' } } }],
+  [{ results: { res: { headers: 'test', url: 'test' } } }],
+  [{ results: { res: { url: 'test' } } }],
+  [{ results: { res: { status: 'test' } } }],
+  [{ results: { res: { headers: 'test', status: 'test' } } }],
+  [{ results: { req: { headers: 'test', url: 'test' } }, res: { headers: 'test', url: 'test' } }],
+  [{ results: { req: { method: 'test', headers: 'test', url: 'test' } }, res: { headers: 'test' } }],
+  [{ results: { req: { method: 'test', headers: 'test', url: 'test' } }, res: { headers: 'test', status: 'test' } }],
+  { results: { req: { method: 'test', headers: 'test', url: 'test' }, res: { headers: 'test', status: 'test' } } },
+]

@@ -9,3 +9,12 @@ export function MissingRequiredField(field: string, subject?: string) {
     ? `${subject} requires a field named: ${field}. This value is missing.`
     : `The required field named: ${field} is missing.`
 }
+
+/**
+ * Validate that the value is an array with atleast one item
+ *
+ * @param value The value to be checked
+ */
+export function HasItems(value: any[]) {
+  return value.length > 0
+}

@@ -1,5 +1,14 @@
 /**
- * Check to see if a value is an object
+ * Validate that the value is an array
+ *
+ * @param value The value to be checked
+ */
+export function IsArray(value: any) {
+  return Array.isArray(value)
+}
+
+/**
+ * Validate that the value is an object
  *
  * @param value The value to be checked
  */
@@ -8,7 +17,7 @@ export function IsObject(value: any) {
 }
 
 /**
- * Check to see if a value is a string
+ * Validate that the value is a string
  *
  * @param value The value to be checked
  */

@@ -4,7 +4,8 @@ import { ContainerPaths } from '../Common/RawDocs.Container'
 import { RawDocData } from '../Common/RawDocs.Interface'
 import { IAilJson, IOperationObjectCollection } from './Interfaces/Ail.Factory.Interfaces'
 import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
-import { MissingRequiredField } from '../Common/Validation/HelperFunctions'
+import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
+import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
 
 /**
  * Used to create AIL JSON objects
@@ -33,7 +34,7 @@ export class AilFactory {
       openApiVersion: this.OPEN_API_VERSION,
       controller,
       paths: rawPaths.map(([path, rawData]) => {
-        this.ValidateRawData(rawData)
+        this.ValidateRawData(path, rawData)
         return this.RawPathToAil(path, rawData)
       }),
     }
@@ -88,11 +89,23 @@ export class AilFactory {
   /**
    * Ensure the the raw API data is in a valid format
    *
+   * This method is used before any parsing to guarentee that all required fields exist
+   * in the raw API data.
+   *
+   * @param path The name of the path
    * @param rawData Raw API documentation data for a controller's paths
    * @throws AilFactoryException if any required field is missing
    */
-  protected static ValidateRawData(rawData: RawDocData[]) {
-    for (const { path, results } of rawData) {
+  protected static ValidateRawData(path: string, rawData: RawDocData[]) {
+    if (!IsArray(rawData) || !HasItems(rawData)) {
+      throw new AilFactoryException(`The API path: ${path} contains no raw data`)
+    }
+
+    for (const { results } of rawData) {
+      if (!IsObject(results)) {
+        throw new AilFactoryException(`The API path: ${path} contained an empty results object`)
+      }
+
       if (!results) {
         throw new AilFactoryException(MissingRequiredField('results', `The API path: ${path}`))
       }
@@ -109,20 +122,12 @@ export class AilFactory {
         throw new AilFactoryException(MissingRequiredField('url', `The API path: ${path} result req object`))
       }
 
-      if (!results.req.data) {
-        throw new AilFactoryException(MissingRequiredField('data', `The API path: ${path} result req object`))
-      }
-
       if (!results.req.headers) {
         throw new AilFactoryException(MissingRequiredField('headers', `The API path: ${path} result req object`))
       }
 
       if (!results.res) {
         throw new AilFactoryException(MissingRequiredField('res', `The API path: ${path} result object`))
-      }
-
-      if (!results.res.body) {
-        throw new AilFactoryException(MissingRequiredField('body', `The API path: ${path} result req object`))
       }
 
       if (!results.res.headers) {
