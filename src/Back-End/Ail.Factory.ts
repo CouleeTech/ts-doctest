@@ -104,21 +104,20 @@ export class AilFactory {
     responseObject.headers = {}
     const hasResponseHeaders = !!value.responseHeaders
 
-    for (const header of Object.keys(value.res.headers)) {
+    for (const header of Object.keys(value.results.res.headers)) {
       responseObject.headers[header] =
         hasResponseHeaders && value.responseHeaders[header]
           ? value.responseHeaders[header].description
             ? {
-                required: true,
                 description: value.responseHeaders[header].description,
-                value: value.res.headers[header],
+                value: value.results.res.headers[header],
               }
-            : { required: true, value: value.res.headers[header] }
-          : { required: true, value: value.res.headers[header] }
+            : { value: value.results.res.headers[header] }
+          : { value: value.results.res.headers[header] }
     }
 
-    if (value.res.body) {
-      responseObject.content = { 'application/json': { example: { ...value.res.body } } }
+    if (value.results.res.body) {
+      responseObject.content = { 'application/json': { example: { ...value.results.res.body } } }
     }
 
     return responseObject

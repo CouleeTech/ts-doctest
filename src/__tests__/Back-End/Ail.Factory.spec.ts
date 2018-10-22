@@ -4,7 +4,7 @@ import { AilFactory } from '../../Back-End/Ail.Factory'
 import { RawDocData } from '../../Common'
 import { AilFactoryException } from '../../Back-End/Exceptions/Ail.Factory.Exception'
 
-import { invalidRawData, validRawData } from '../Payloads/RawApi.Payloads'
+import { invalidRawData, validRawData, validRawApiResponse } from '../Payloads/RawApi.Payloads'
 
 class MockAilFactory extends AilFactory {
   public static rawToAil = (path: string, rawData: RawDocData[]) => MockAilFactory.RawPathToAil(path, rawData)
@@ -12,33 +12,17 @@ class MockAilFactory extends AilFactory {
     MockAilFactory.ValidateRawData(path, rawData)
 }
 
-interface IRawData {
-  path: string
-  rawData: RawDocData[]
-}
-
-const mockPathName = '/test'
-const mockRawData: IRawData = {
-  path: mockPathName,
-  rawData: [
-    {
-      path: mockPathName,
-      results: {
-        req: { method: 'GET' },
-        res: {},
-      },
-    },
-  ],
-}
 const pathOperations = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
 
 beforeAll(() => {})
 
 describe('AIL Factory', () => {
   it('RawPathToAil should return a valid PathsObject', () => {
-    const { path, rawData } = mockRawData
-    const pathObject: PathsObject = MockAilFactory.rawToAil(path, rawData)
-    validatePathsObject(path, pathObject)
+    const rawApiData = validRawApiResponse()
+    for (const path of rawApiData) {
+      const pathObject: PathsObject = MockAilFactory.rawToAil(path[0] as string, path[1] as any)
+      validatePathsObject(path[0] as string, pathObject)
+    }
   })
 
   it('ValidateRawData should throw exceptions for invalid data', () => {
@@ -55,6 +39,9 @@ describe('AIL Factory', () => {
     for (const trial of trials) {
       expect(() => MockAilFactory.validateRawDataInTest(path, trial as any))
     }
+    for (const validPath of validRawApiResponse()) {
+      expect(() => MockAilFactory.validateRawDataInTest(validPath[0] as string, validPath[1] as any))
+    }
   })
 })
 
@@ -64,6 +51,8 @@ function validatePathsObject(path: string, pathObject: PathsObject) {
   // The one key should be the name of the path
   expect(pathObject).toHaveProperty(path)
   validatePathsItemObject(pathObject[path])
+  console.log(path)
+  console.log(JSON.stringify(pathObject))
 }
 
 function validatePathsItemObject(item: PathItemObject) {
