@@ -1,4 +1,4 @@
-import { OperationObject, PathsObject, PathItemObject, ResponseObject } from 'openapi3-ts'
+import { OperationObject, PathsObject, PathItemObject, ResponseObject, RequestBodyObject } from 'openapi3-ts'
 
 import { ContainerPaths } from '../Common/RawDocs.Container'
 import { RawDocData } from '../Common/RawDocs.Interface'
@@ -6,6 +6,7 @@ import { IAilJson, IOperationObjectCollection, NO_DESCRIPTION_PROVIDED } from '.
 import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
 import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
 import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
+import { HttpMethodWithRequestBody } from '../Common/Http'
 
 /**
  * Used to create AIL JSON objects
@@ -71,6 +72,7 @@ export class AilFactory {
     for (const value of rawData) {
       const type = value.results!.req.method.toLowerCase()
 
+      // Each Operation object should have only one array per HTTP method
       if (!operations[type]) {
         const operationObjectArray: OperationObject[] = []
         operations[type] = operationObjectArray
@@ -84,10 +86,25 @@ export class AilFactory {
         ],
       }
 
+      console.log(':SDADSAASDDSASDA')
+      if (HttpMethodWithRequestBody(type)) {
+        console.log(':SDADSAASDDSASDA')
+        operationType.requestBody = this.RequestBodyFromRawData(value)
+      }
+
       operations[type].push(operationType)
     }
 
     return operations
+  }
+
+  protected static RequestBodyFromRawData(value: any): RequestBodyObject {
+    const requestBodyObject: RequestBodyObject =
+      value.requestBody && value.requestBody.description
+        ? { content: value.results.req.data, description: value.requestBody.description }
+        : { content: value.results.req.data }
+
+    return requestBodyObject
   }
 
   /**

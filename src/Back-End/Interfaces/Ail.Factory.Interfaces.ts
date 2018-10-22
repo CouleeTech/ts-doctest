@@ -1,5 +1,5 @@
 import { OperationObject, PathsObject, ResponseObject } from 'openapi3-ts'
-import { IHttpRequestHeader, HttpRequestMethod } from '../../Common/Http.Types'
+import { IHttpRequestHeader, HttpRequestMethod } from '../../Common/Http'
 
 export const pathOperations = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
 

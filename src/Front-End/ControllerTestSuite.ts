@@ -2,7 +2,7 @@ import * as supertest from 'supertest'
 import { Response } from 'superagent'
 
 import { RawDocContainer } from '../Common/RawDocs.Container'
-import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http.Types'
+import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http'
 import { RawDocData } from '../Common/RawDocs.Interface'
 
 import { IApplication } from './Application.Interface'
