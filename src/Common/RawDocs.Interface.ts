@@ -1,3 +1,10 @@
+// Request Parameters
+
+export interface IRequestParameters {
+  queryParameters?: any
+  pathParameters?: any
+}
+
 // Request Header
 export interface IRequestHeaderOptions {
   description?: string
@@ -58,12 +65,11 @@ export interface IResults {
   res: any
 }
 
-export type RawDocData = Partial<{
-  path: string
+export type RawDocData = { path: string; results: IResults } & Partial<{
+  parameters: IRequestParameters
   requestBody: IRequestBody
   requestHeaders: IRequestHeaders
   responseBody: IResponseBody
   responseHeaders: IResponseHeaders
   responseStatus: IResponseStatus
-  results: IResults
 }>

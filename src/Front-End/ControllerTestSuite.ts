@@ -3,7 +3,7 @@ import { Response } from 'superagent'
 
 import { RawDocContainer } from '../Common/RawDocs.Container'
 import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http'
-import { RawDocData } from '../Common/RawDocs.Interface'
+import { RawDocData, IRequestParameters } from '../Common/RawDocs.Interface'
 
 import { IApplication } from './Application.Interface'
 import { RequestWrapper } from './Request.Wrapper'
@@ -153,7 +153,14 @@ export abstract class ControllerTestSuite {
                 )
               }
 
-              const reqWrapper: RequestWrapper = new RequestWrapper(path.name, reqTestObject)
+              const requestWrapperParams: IRequestParameters = {}
+              if (config.query) requestWrapperParams.queryParameters = config.query
+              if (path.templates) requestWrapperParams.pathParameters = path.templates
+
+              const reqWrapper: RequestWrapper =
+                config.query || path.templates
+                  ? new RequestWrapper(path.name, reqTestObject, requestWrapperParams)
+                  : new RequestWrapper(path.name, reqTestObject)
               this.requestWrappers.add(reqWrapper)
               await generator(reqWrapper)()
             })

@@ -9,6 +9,7 @@ import {
   IResponseHeaderOptions,
   IResponseStatusOptions,
   RawDocData,
+  IRequestParameters,
 } from '../Common/RawDocs.Interface'
 import { IsString } from '../Common/Validation/TypeChecks'
 
@@ -25,20 +26,27 @@ export interface IHeaderStorage extends IRequestHeaderOptions {
 export class RequestWrapper {
   private readonly path: any
   private readonly request: any
+  private parameters: IRequestParameters
   private requestBody?: IRequestBody
   private requestHeaders: Set<IHeaderStorage>
   private responseBody?: IResponseBody
   private responseHeaders: Set<IHeaderStorage>
   private responseStatus?: IResponseStatus
-  private results?: IResults
+  private results: IResults
 
   /**
    * @param path The path associated with this request
    * @param req A Test object provided by the supertest library
+   * @param params an optional set of query or path parameters associated with the request
    */
-  constructor(path: string, req: any) {
+  constructor(path: string, req: any, params?: IRequestParameters) {
     this.path = path
     this.request = req
+
+    if (params) {
+      this.configureParameters(params)
+    }
+
     req.expect((res: any) => (this.results = RequestWrapper.ParseRawResponse(res)))
     this.requestHeaders = new Set<IHeaderStorage>()
     this.responseHeaders = new Set<IHeaderStorage>()
@@ -164,6 +172,10 @@ export class RequestWrapper {
   public exportRequestDocs(): RawDocData {
     const docs: RawDocData = { path: this.path, results: this.results }
 
+    if (this.parameters) {
+      docs.parameters = this.parameters
+    }
+
     if (this.requestHeaders.size > 0) {
       docs.requestHeaders = {}
 
@@ -197,6 +209,10 @@ export class RequestWrapper {
     return docs
   }
 
+  private configureParameters(parameters: IRequestParameters) {
+    this.parameters = parameters
+  }
+
   /**
    * The response object returned from the supertest library is in a raw unweidly format.
    * This function ensures that the reponse object will be formatted in a way that is useful
@@ -206,6 +222,7 @@ export class RequestWrapper {
    */
   private static ParseRawResponse(response: any) {
     // TODO : Add validation to check for errors in the response object
+    // TODO : Add ways to parse response types other than JSON
     const rawData = JSON.parse(JSON.stringify(response))
     const { text, req, header, ...everythingElse } = rawData
     const body = JSON.parse(text)

@@ -78,6 +78,7 @@ export class AilFactory {
         operations[type] = operationObjectArray
       }
 
+      // At least one response is required
       const operationType: OperationObject = {
         responses: [
           {
