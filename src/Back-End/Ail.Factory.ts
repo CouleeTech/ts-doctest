@@ -86,9 +86,7 @@ export class AilFactory {
         ],
       }
 
-      console.log(':SDADSAASDDSASDA')
       if (HttpMethodWithRequestBody(type)) {
-        console.log(':SDADSAASDDSASDA')
         operationType.requestBody = this.RequestBodyFromRawData(value)
       }
 
