@@ -36,3 +36,14 @@ export function MatrixQueryString(name: string, value: any, explode: boolean = f
 
   throw new Error('Invalid query string value')
 }
+
+/**
+ * Build a form-style query string
+ *
+ * This format is defined by RFC6570.
+ *
+ * @param name The name of the query parameter
+ * @param value The value of the query parameter.
+ * @param explode Build the query string in an expanded format.
+ */
+export function FormQueryString(name: string, value: any, explode: boolean = true) {}
