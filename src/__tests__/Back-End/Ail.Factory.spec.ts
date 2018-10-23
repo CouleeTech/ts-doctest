@@ -25,7 +25,7 @@ describe('AIL Factory', () => {
     }
   })
 
-  it('ValidateRawData should throw exceptions for invalid data', () => {
+  it('should use the ValidateRawData method to throw exceptions for invalid data', () => {
     const path = 'TEST'
     const trials = invalidRawData()
     for (const trial of trials) {
@@ -33,7 +33,7 @@ describe('AIL Factory', () => {
     }
   })
 
-  it('ValidateRawData should not throw exceptions for valid data', () => {
+  it('should not have any issues while validating valid raw API data using the ValidateRawData method', () => {
     const path = 'TEST'
     const trials = validRawData()
     for (const trial of trials) {
