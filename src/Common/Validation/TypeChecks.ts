@@ -24,3 +24,12 @@ export function IsObject(value: any) {
 export function IsString(value: any) {
   return typeof value === 'string' || value instanceof String
 }
+
+/**
+ * Validate that the value is a number
+ *
+ * @param value The value to be checked
+ */
+export function IsNumber(value: any) {
+  return typeof value === 'number' && Number.isFinite(value)
+}
