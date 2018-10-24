@@ -6,6 +6,7 @@ import {
   SimpleParameterString,
   SpaceDelimitedParameterString,
   PipeDelimitedParameterString,
+  DeepObjectParameterString,
 } from '../../Common/Util/ParameterString.Builder.'
 
 const testName = 'color'
@@ -15,7 +16,7 @@ const testArrayValue = ['blue', 'black', 'brown']
 const testObjectValue = { R: 100, G: 200, B: 150 }
 
 describe('Parameter Building Functions', () => {
-  it('Should include include a function that creates form-style parameters.', () => {
+  it('Should include include a function that builds form-style parameters.', () => {
     const emptyResult = 'color='
 
     expect(FormParameterString(testName, emptyValue, false)).toBe(emptyResult)
@@ -40,7 +41,7 @@ describe('Parameter Building Functions', () => {
     expect(FormParameterString(testName, testObjectValue)).toBe(explodedObjectString)
   })
 
-  it('Should include include a function that creates label-style parameters.', () => {
+  it('Should include include a function that builds label-style parameters.', () => {
     const emptyResult = '.'
 
     expect(LabelParameterString(emptyValue)).toBe(emptyResult)
@@ -65,7 +66,7 @@ describe('Parameter Building Functions', () => {
     expect(LabelParameterString(testObjectValue, true)).toBe(explodedObjectString)
   })
 
-  it('Should include include a function that creates matrix-style parameters.', () => {
+  it('Should include include a function that builds matrix-style parameters.', () => {
     const emptyResult = ';color'
 
     expect(MatrixParameterString(testName, emptyValue)).toBe(emptyResult)
@@ -90,7 +91,7 @@ describe('Parameter Building Functions', () => {
     expect(MatrixParameterString(testName, testObjectValue, true)).toBe(explodedObjectString)
   })
 
-  it('Should include include a function that creates simple-style parameters.', () => {
+  it('Should include include a function that builds simple-style parameters.', () => {
     expect(() => SimpleParameterString(emptyValue)).toThrow(ParameterException)
     expect(() => SimpleParameterString(emptyValue, true)).toThrow(ParameterException)
 
@@ -113,7 +114,7 @@ describe('Parameter Building Functions', () => {
     expect(SimpleParameterString(testObjectValue, true)).toBe(explodedObjectString)
   })
 
-  it('Should include include a function that creates space-delimited parameters.', () => {
+  it('Should include include a function that builds space-delimited parameters.', () => {
     expect(() => SpaceDelimitedParameterString(emptyValue)).toThrow(ParameterException)
     expect(() => SpaceDelimitedParameterString(testStringValue)).toThrow(ParameterException)
     const arrayString = 'blue%20black%20brown'
@@ -122,12 +123,20 @@ describe('Parameter Building Functions', () => {
     expect(SpaceDelimitedParameterString(testObjectValue)).toBe(objectString)
   })
 
-  it('Should include include a function that creates pipe-delimited parameters.', () => {
+  it('Should include include a function that builds pipe-delimited parameters.', () => {
     expect(() => PipeDelimitedParameterString(emptyValue)).toThrow(ParameterException)
     expect(() => PipeDelimitedParameterString(testStringValue)).toThrow(ParameterException)
     const arrayString = 'blue|black|brown'
     expect(PipeDelimitedParameterString(testArrayValue)).toBe(arrayString)
     const objectString = 'R|100|G|200|B|150'
     expect(PipeDelimitedParameterString(testObjectValue)).toBe(objectString)
+  })
+
+  it('Should include include a function that builds deep object parameters.', () => {
+    expect(() => DeepObjectParameterString(testName, emptyValue)).toThrow(ParameterException)
+    expect(() => DeepObjectParameterString(testName, testStringValue)).toThrow(ParameterException)
+    expect(() => DeepObjectParameterString(testName, testArrayValue)).toThrow(ParameterException)
+    const objectString = 'color[R]=100&color[G]=200&color[B]=150'
+    expect(DeepObjectParameterString(testName, testObjectValue)).toBe(objectString)
   })
 })

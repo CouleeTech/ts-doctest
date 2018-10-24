@@ -168,7 +168,7 @@ export function SpaceDelimitedParameterString(value: any) {
 }
 
 /**
- * Build a space-delimited parameter string
+ * Build a pipe-delimited parameter string
  *
  * @param value The value of the parameter.
  */
@@ -183,6 +183,28 @@ export function PipeDelimitedParameterString(value: any) {
     return `${Object.keys(value)
       .map(key => `${key}|${value[key]}`)
       .join('|')}`
+  }
+
+  return UnexpectedValue(value)
+}
+
+/**
+ * Build a deep object parameter string
+ *
+ * @param name The name of the parameter.
+ * @param value The value of the parameter.
+ */
+export function DeepObjectParameterString(name: string, value: any) {
+  if (IsFalsy(value)) {
+    NotAcceptable('Falsy', 'deep object')
+  } else if (IsString(value) || IsNumber(value)) {
+    NotAcceptable('String or Number', 'deep object')
+  } else if (IsArray(value)) {
+    NotAcceptable('Array', 'deep object')
+  } else if (IsObject(value)) {
+    return `${Object.keys(value)
+      .map(key => `${name}[${key}]=${value[key]}`)
+      .join('&')}`
   }
 
   return UnexpectedValue(value)
