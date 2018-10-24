@@ -1,4 +1,4 @@
-import { IsObject, IsArray, IsString, IsNumber } from '../Validation'
+import { IsObject, IsArray, IsString, IsNumber, IsFalsy } from '../Validation'
 
 export type ParameterString = string
 
@@ -12,8 +12,16 @@ export type ParameterString = string
  * @param explode Build the parameter string in an expanded format.
  */
 export function MatrixParameterString(name: string, value: any, explode: boolean = false): ParameterString {
-  if (IsString(value) || IsNumber(value)) {
+  if (IsFalsy(value)) {
+    return `;${name}`
+  } else if (IsString(value) || IsNumber(value)) {
     return `;${name}=${value}`
+  } else if (IsArray(value)) {
+    if (explode) {
+      return `;${value.map((entry: any) => `${name}=${entry}`).join(';')}`
+    }
+
+    return `;${name}=${value.join(',')}`
   } else if (IsObject(value)) {
     if (explode) {
       return `;${Object.keys(value)
@@ -26,15 +34,9 @@ export function MatrixParameterString(name: string, value: any, explode: boolean
       .join(',')
 
     return `;${name}=${valueString}`
-  } else if (IsArray(value)) {
-    if (explode) {
-      return `;${value.map((entry: any) => `${name}=${entry}`).join(';')}`
-    }
-
-    return `;${name}=${value.join(',')}`
   }
 
-  throw new Error('Invalid query string value')
+  throw new Error('Invalid parameter string value')
 }
 
 /**
@@ -47,5 +49,29 @@ export function MatrixParameterString(name: string, value: any, explode: boolean
  * @param explode Build the parameter parameter in an expanded format.
  */
 export function FormParameterString(name: string, value: any, explode: boolean = true) {
-  if (name || value || explode) return
+  if (IsFalsy(value)) {
+    return `${name}=`
+  } else if (IsString(value) || IsNumber(value)) {
+    return `${name}=${value}`
+  } else if (IsArray(value)) {
+    if (explode) {
+      return `${value.map((entry: any) => `${name}=${entry}`).join('&')}`
+    }
+
+    return `${name}=${value.join(',')}`
+  } else if (IsObject(value)) {
+    if (explode) {
+      return `${Object.keys(value)
+        .map(key => `${key}=${value[key]}`)
+        .join('&')}`
+    }
+
+    const valueString = Object.keys(value)
+      .map(key => [key, value[key]])
+      .join(',')
+
+    return `${name}=${valueString}`
+  }
+
+  throw new Error('Invalid parameter string value')
 }
