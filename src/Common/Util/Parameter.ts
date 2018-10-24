@@ -1,17 +1,17 @@
 import { IsObject, IsArray, IsString, IsNumber } from '../Validation'
 
-export type QueryString = string
+export type ParameterString = string
 
 /**
- * Build a matrix-style query string
+ * Build a matrix-style parameter string
  *
  * This format is defined by RFC6570.
  *
- * @param name The name of the query parameter
- * @param value The value of the query parameter.
- * @param explode Build the query string in an expanded format.
+ * @param name The name of the parameter parameter
+ * @param value The value of the parameter parameter.
+ * @param explode Build the parameter string in an expanded format.
  */
-export function MatrixQueryString(name: string, value: any, explode: boolean = false): QueryString {
+export function MatrixParameterString(name: string, value: any, explode: boolean = false): ParameterString {
   if (IsString(value) || IsNumber(value)) {
     return `;${name}=${value}`
   } else if (IsObject(value)) {
@@ -38,12 +38,14 @@ export function MatrixQueryString(name: string, value: any, explode: boolean = f
 }
 
 /**
- * Build a form-style query string
+ * Build a form-style parameter string
  *
  * This format is defined by RFC6570.
  *
- * @param name The name of the query parameter
- * @param value The value of the query parameter.
- * @param explode Build the query string in an expanded format.
+ * @param name The name of the parameter parameter
+ * @param value The value of the parameter parameter.
+ * @param explode Build the parameter parameter in an expanded format.
  */
-export function FormQueryString(name: string, value: any, explode: boolean = true) {}
+export function FormParameterString(name: string, value: any, explode: boolean = true) {
+  if (name || value || explode) return
+}
