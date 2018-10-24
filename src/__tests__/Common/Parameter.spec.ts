@@ -4,6 +4,7 @@ import {
   LabelParameterString,
   ParameterException,
   SimpleParameterString,
+  SpaceDelimitedParameterString,
 } from '../../Common/Util/Parameter'
 
 const testName = 'color'
@@ -109,5 +110,14 @@ describe('Parameter Building Functions', () => {
 
     expect(SimpleParameterString(testObjectValue)).toBe(objectString)
     expect(SimpleParameterString(testObjectValue, true)).toBe(explodedObjectString)
+  })
+
+  it('Should include include a function that creates space-delimited parameters.', () => {
+    expect(() => SpaceDelimitedParameterString(emptyValue)).toThrow(ParameterException)
+    expect(() => SpaceDelimitedParameterString(testStringValue)).toThrow(ParameterException)
+    const arrayString = 'blue%20black%20brown'
+    expect(SpaceDelimitedParameterString(testArrayValue)).toBe(arrayString)
+    const objectString = 'R%20100%20G%20200%20B%20150'
+    expect(SpaceDelimitedParameterString(testObjectValue)).toBe(objectString)
   })
 })

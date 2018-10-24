@@ -126,7 +126,7 @@ export function MatrixParameterString(name: string, value: any, explode: boolean
  */
 export function SimpleParameterString(value: any, explode: boolean = false) {
   if (IsFalsy(value)) {
-    NotAcceptable('Falsy', 'simple')
+    NotAcceptable('Falsy', 'simple-style')
   } else if (IsString(value) || IsNumber(value)) {
     return value
   } else if (IsArray(value)) {
@@ -146,8 +146,29 @@ export function SimpleParameterString(value: any, explode: boolean = false) {
   return UnexpectedValue(value)
 }
 
+/**
+ * Build a space-delimited parameter string
+ *
+ * @param value The value of the parameter.
+ */
+export function SpaceDelimitedParameterString(value: any) {
+  if (IsFalsy(value)) {
+    NotAcceptable('Falsy', 'space-delimited')
+  } else if (IsString(value) || IsNumber(value)) {
+    NotAcceptable('String or Number', 'space-delimited')
+  } else if (IsArray(value)) {
+    return value.join('%20')
+  } else if (IsObject(value)) {
+    return `${Object.keys(value)
+      .map(key => `${key}%20${value[key]}`)
+      .join('%20')}`
+  }
+
+  return UnexpectedValue(value)
+}
+
 function NotAcceptable(type: string, style: string): ParameterException {
-  throw new ParameterException(`${type} values are not valid for ${style}-style parameters`)
+  throw new ParameterException(`${type} values are not valid for ${style} parameters`)
 }
 
 function UnexpectedValue(value: any): ParameterException {
