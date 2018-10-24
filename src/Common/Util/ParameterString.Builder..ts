@@ -167,6 +167,27 @@ export function SpaceDelimitedParameterString(value: any) {
   return UnexpectedValue(value)
 }
 
+/**
+ * Build a space-delimited parameter string
+ *
+ * @param value The value of the parameter.
+ */
+export function PipeDelimitedParameterString(value: any) {
+  if (IsFalsy(value)) {
+    NotAcceptable('Falsy', 'pipe-delimited')
+  } else if (IsString(value) || IsNumber(value)) {
+    NotAcceptable('String or Number', 'pipe-delimited')
+  } else if (IsArray(value)) {
+    return value.join('|')
+  } else if (IsObject(value)) {
+    return `${Object.keys(value)
+      .map(key => `${key}|${value[key]}`)
+      .join('|')}`
+  }
+
+  return UnexpectedValue(value)
+}
+
 function NotAcceptable(type: string, style: string): ParameterException {
   throw new ParameterException(`${type} values are not valid for ${style} parameters`)
 }

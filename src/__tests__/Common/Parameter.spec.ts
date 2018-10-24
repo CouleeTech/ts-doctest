@@ -5,7 +5,8 @@ import {
   ParameterException,
   SimpleParameterString,
   SpaceDelimitedParameterString,
-} from '../../Common/Util/Parameter'
+  PipeDelimitedParameterString,
+} from '../../Common/Util/ParameterString.Builder.'
 
 const testName = 'color'
 const emptyValue: any = false
@@ -119,5 +120,14 @@ describe('Parameter Building Functions', () => {
     expect(SpaceDelimitedParameterString(testArrayValue)).toBe(arrayString)
     const objectString = 'R%20100%20G%20200%20B%20150'
     expect(SpaceDelimitedParameterString(testObjectValue)).toBe(objectString)
+  })
+
+  it('Should include include a function that creates pipe-delimited parameters.', () => {
+    expect(() => PipeDelimitedParameterString(emptyValue)).toThrow(ParameterException)
+    expect(() => PipeDelimitedParameterString(testStringValue)).toThrow(ParameterException)
+    const arrayString = 'blue|black|brown'
+    expect(PipeDelimitedParameterString(testArrayValue)).toBe(arrayString)
+    const objectString = 'R|100|G|200|B|150'
+    expect(PipeDelimitedParameterString(testObjectValue)).toBe(objectString)
   })
 })
