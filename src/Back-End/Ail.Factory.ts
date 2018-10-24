@@ -1,4 +1,12 @@
-import { OperationObject, PathsObject, PathItemObject, ResponseObject, RequestBodyObject } from 'openapi3-ts'
+import {
+  OperationObject,
+  PathsObject,
+  PathItemObject,
+  ResponseObject,
+  RequestBodyObject,
+  MediaTypeObject,
+  ParameterObject,
+} from 'openapi3-ts'
 
 import { ContainerPaths } from '../Common/RawDocs.Container'
 import { RawDocData } from '../Common/RawDocs.Interface'
@@ -7,6 +15,10 @@ import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
 import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
 import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
 import { HttpMethodWithRequestBody } from '../Common/Http'
+import { SimpleParameterString } from '../Common/Util/ParameterString.Builder.'
+
+// The headers should be filtered out if included with raw API data
+const BANNED_HEADERS = ['x-powered-by', 'etag', 'connection']
 
 /**
  * Used to create AIL JSON objects
@@ -91,52 +103,108 @@ export class AilFactory {
         operationType.requestBody = this.RequestBodyFromRawData(value)
       }
 
+      if (value.parameters) {
+        operationType.parameters = AilFactory.ParametersFromRawData(value)
+      }
+
       operations[type].push(operationType)
     }
 
     return operations
   }
 
-  protected static RequestBodyFromRawData(value: any): RequestBodyObject {
+  /**
+   * Convert raw API data into an array of AIL parameter objects
+   *
+   * @param rawData The raw API data
+   */
+  protected static ParametersFromRawData(rawData: RawDocData): ParameterObject[] {
+    const parameters: ParameterObject[] = []
+
+    if (rawData.parameters!.pathParameters) {
+      for (const pathParam of rawData.parameters!.pathParameters) {
+        parameters.push({ name: pathParam, in: 'path' })
+      }
+    }
+
+    if (rawData.parameters!.queryParameters) {
+      const queryParams = rawData.parameters!.queryParameters
+      if (IsArray(queryParams)) {
+        for (const queryParam of queryParams) {
+          parameters.push({ name: queryParam.key, in: 'query', example: queryParam.value })
+        }
+      } else {
+        parameters.push({ name: queryParams.key, in: 'query', example: queryParams.value })
+      }
+    }
+
+    return parameters
+  }
+
+  /**
+   * Convert raw API data into an AIL request body object
+   *
+   * This method assumes that all included request body objects are required.
+   *
+   * @param rawData The raw API data
+   */
+  protected static RequestBodyFromRawData(rawData: RawDocData): RequestBodyObject {
+    // TODO : Add a way to configure what the content media type is
     const requestBodyObject: RequestBodyObject =
-      value.requestBody && value.requestBody.description
-        ? { content: value.results.req.data, description: value.requestBody.description }
-        : { content: value.results.req.data }
+      rawData.requestBody && rawData.requestBody.description
+        ? {
+            content: AilFactory.JsonContent(rawData.results.req.data),
+            description: rawData.requestBody.description,
+            required: true,
+          }
+        : { content: AilFactory.JsonContent(rawData.results.req.data), required: true }
 
     return requestBodyObject
   }
 
   /**
-   * Convert a raw response object into AIL JSON
+   * Convert raw API data into an AIL response object
    *
-   * @param res The raw result's respose object
+   * @param rawData The raw API data
    * @param responseBody The optional user supplied response body data
    */
-  protected static ResponseObjectFromRawData(value: any): ResponseObject {
-    const responseObject: ResponseObject = value.responseBody
-      ? { description: value.responseBody.description ? value.responseBody.description : NO_DESCRIPTION_PROVIDED }
+  protected static ResponseObjectFromRawData(rawData: RawDocData): ResponseObject {
+    const responseObject: ResponseObject = rawData.responseBody
+      ? { description: rawData.responseBody.description ? rawData.responseBody.description : NO_DESCRIPTION_PROVIDED }
       : { description: NO_DESCRIPTION_PROVIDED }
 
     responseObject.headers = {}
-    const hasResponseHeaders = !!value.responseHeaders
+    const hasResponseHeaders = !!rawData.responseHeaders
 
-    for (const header of Object.keys(value.results.res.headers)) {
-      responseObject.headers[header] =
-        hasResponseHeaders && value.responseHeaders[header]
-          ? value.responseHeaders[header].description
-            ? {
-                description: value.responseHeaders[header].description,
-                value: value.results.res.headers[header],
-              }
-            : { value: value.results.res.headers[header] }
-          : { value: value.results.res.headers[header] }
-    }
+    Object.keys(rawData.results.res.headers)
+      .filter(header => !BANNED_HEADERS.includes(header))
+      .forEach(header => {
+        responseObject.headers![header] =
+          hasResponseHeaders && rawData.responseHeaders![header]
+            ? rawData.responseHeaders![header].description
+              ? {
+                  description: rawData.responseHeaders![header].description,
+                  example: SimpleParameterString(rawData.results.res.headers[header]),
+                }
+              : { example: SimpleParameterString(rawData.results.res.headers[header]) }
+            : { example: SimpleParameterString(rawData.results.res.headers[header]) }
+      })
 
-    if (value.results.res.body) {
-      responseObject.content = { 'application/json': { example: { ...value.results.res.body } } }
+    if (rawData.results.res.body) {
+      // TODO : Add a way to configure what the content media type is
+      responseObject.content = AilFactory.JsonContent(rawData.results.res.body)
     }
 
     return responseObject
+  }
+
+  /**
+   * Format example content into an AIL media type object
+   *
+   * @param example The example content
+   */
+  protected static JsonContent(example: any): MediaTypeObject {
+    return { 'application/json': { example: { ...example } } }
   }
 
   /**

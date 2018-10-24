@@ -1,5 +1,4 @@
 // Request Parameters
-
 export interface IRequestParameters {
   queryParameters?: any
   pathParameters?: any

@@ -153,6 +153,7 @@ export abstract class ControllerTestSuite {
                 )
               }
 
+              // TODO : Clean up this section of code...
               const requestWrapperParams: IRequestParameters = {}
               if (config.query) requestWrapperParams.queryParameters = config.query
               if (path.templates) requestWrapperParams.pathParameters = path.templates
