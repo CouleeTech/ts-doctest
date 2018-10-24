@@ -1,4 +1,10 @@
-import { MatrixParameterString, FormParameterString, LabelParameterString } from '../../Common/Util/Parameter'
+import {
+  MatrixParameterString,
+  FormParameterString,
+  LabelParameterString,
+  ParameterException,
+  SimpleParameterString,
+} from '../../Common/Util/Parameter'
 
 const testName = 'color'
 const emptyValue: any = false
@@ -80,5 +86,28 @@ describe('Parameter Building Functions', () => {
 
     expect(MatrixParameterString(testName, testObjectValue)).toBe(objectString)
     expect(MatrixParameterString(testName, testObjectValue, true)).toBe(explodedObjectString)
+  })
+
+  it('Should include include a function that creates simple-style parameters.', () => {
+    expect(() => SimpleParameterString(emptyValue)).toThrow(ParameterException)
+    expect(() => SimpleParameterString(emptyValue, true)).toThrow(ParameterException)
+
+    const stringResult = 'blue'
+    const explodedStringResult = 'blue'
+
+    expect(SimpleParameterString(testStringValue)).toBe(stringResult)
+    expect(SimpleParameterString(testStringValue, true)).toBe(explodedStringResult)
+
+    const arrayString = 'blue,black,brown'
+    const explodedArrayString = 'blue,black,brown'
+
+    expect(SimpleParameterString(testArrayValue)).toBe(arrayString)
+    expect(SimpleParameterString(testArrayValue, true)).toBe(explodedArrayString)
+
+    const objectString = 'R,100,G,200,B,150'
+    const explodedObjectString = 'R=100,G=200,B=150'
+
+    expect(SimpleParameterString(testObjectValue)).toBe(objectString)
+    expect(SimpleParameterString(testObjectValue, true)).toBe(explodedObjectString)
   })
 })
