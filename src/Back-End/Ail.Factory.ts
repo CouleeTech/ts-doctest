@@ -6,10 +6,11 @@ import {
   RequestBodyObject,
   MediaTypeObject,
   ParameterObject,
+  ParameterLocation,
 } from 'openapi3-ts'
 
 import { ContainerPaths } from '../Common/RawDocs.Container'
-import { RawDocData } from '../Common/RawDocs.Interface'
+import { RawDocData, IRawHeader } from '../Common/RawDocs.Interface'
 import { IAilJson, IOperationObjectCollection, NO_DESCRIPTION_PROVIDED } from './Interfaces/Ail.Factory.Interfaces'
 import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
 import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
@@ -121,9 +122,17 @@ export class AilFactory {
   protected static ParametersFromRawData(rawData: RawDocData): ParameterObject[] {
     const parameters: ParameterObject[] = []
 
+    const requestHeaders = rawData.requestHeaders
+      ? this.ParseRawHeaders(rawData.results.req.headers, rawData.requestHeaders)
+      : this.ParseRawHeaders(rawData.results.req.headers)
+
+    for (const requestParameter of requestHeaders) {
+      parameters.push(requestParameter)
+    }
+
     if (rawData.parameters!.pathParameters) {
       for (const pathParam of rawData.parameters!.pathParameters) {
-        parameters.push({ name: pathParam, in: 'path' })
+        parameters.push({ name: pathParam, in: 'path', required: true })
       }
     }
 
@@ -174,21 +183,14 @@ export class AilFactory {
       : { description: NO_DESCRIPTION_PROVIDED }
 
     responseObject.headers = {}
-    const hasResponseHeaders = !!rawData.responseHeaders
 
-    Object.keys(rawData.results.res.headers)
-      .filter(header => !BANNED_HEADERS.includes(header))
-      .forEach(header => {
-        responseObject.headers![header] =
-          hasResponseHeaders && rawData.responseHeaders![header]
-            ? rawData.responseHeaders![header].description
-              ? {
-                  description: rawData.responseHeaders![header].description,
-                  example: SimpleParameterString(rawData.results.res.headers[header]),
-                }
-              : { example: SimpleParameterString(rawData.results.res.headers[header]) }
-            : { example: SimpleParameterString(rawData.results.res.headers[header]) }
-      })
+    const responseHeaders = rawData.responseHeaders
+      ? this.ParseRawHeaders(rawData.results.res.headers, rawData.responseHeaders)
+      : this.ParseRawHeaders(rawData.results.res.headers)
+
+    for (const { name, in: notUsed, ...properties } of responseHeaders) {
+      responseObject.headers[name] = properties
+    }
 
     if (rawData.results.res.body) {
       // TODO : Add a way to configure what the content media type is
@@ -196,6 +198,39 @@ export class AilFactory {
     }
 
     return responseObject
+  }
+
+  /**
+   * Convert raw API headers into formatted AIL JSON
+   *
+   * @param headers Headers from a raw API request or response
+   * @param headerDetails Optional details for header documentation
+   */
+  protected static ParseRawHeaders(
+    headers: { [name: string]: string },
+    headerDetails?: { [name: string]: IRawHeader },
+  ): ParameterObject[] {
+    const formattedHeaders: ParameterObject[] = Object.keys(headers)
+      .filter(header => !BANNED_HEADERS.includes(header))
+      .map(header => {
+        if (headerDetails && headerDetails[header]) {
+          const { value, ...options } = headerDetails[header]
+          return {
+            name: header,
+            in: 'header' as ParameterLocation,
+            example: SimpleParameterString(headers[header]),
+            ...options,
+          }
+        }
+
+        return {
+          name: header,
+          in: 'header' as ParameterLocation,
+          example: SimpleParameterString(headers[header]),
+        }
+      })
+
+    return formattedHeaders
   }
 
   /**

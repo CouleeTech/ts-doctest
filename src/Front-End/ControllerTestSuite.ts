@@ -173,7 +173,6 @@ export abstract class ControllerTestSuite {
           await this.app.close()
           for (const reqWrapper of this.requestWrappers.values()) {
             const rawDocs: RawDocData = reqWrapper.exportRequestDocs()
-            console.log(this.path.name)
             this.resultContainer.save(rawDocs)
           }
           await AilManager.ConsumeContainer(this.resultContainer)

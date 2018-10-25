@@ -4,15 +4,19 @@ export interface IRequestParameters {
   pathParameters?: any
 }
 
-// Request Header
-export interface IRequestHeaderOptions {
+// Header
+export interface IRawHeaderOptions {
+  deprecated?: boolean
   description?: string
+  required?: boolean
 }
 
-export interface IRequestHeader extends IRequestHeaderOptions {
-  value: any
+export interface IRawHeader extends IRawHeaderOptions {
+  value: string
 }
 
+// Request Header
+export interface IRequestHeader extends IRawHeader {}
 // Request Body
 export interface IRequestBodyOptions {
   description?: string
@@ -23,13 +27,7 @@ export interface IRequestBody extends IRequestBodyOptions {
 }
 
 // Response Header
-export interface IResponseHeaderOptions {
-  description?: string
-}
-
-export interface IResponseHeader extends IResponseHeaderOptions {
-  value: any
-}
+export interface IResponseHeader extends IRawHeader {}
 
 // Response Body
 export interface IResponseBodyOptions {
