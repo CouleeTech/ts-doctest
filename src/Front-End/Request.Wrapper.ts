@@ -3,10 +3,9 @@ import {
   IRequestBody,
   IResponseStatus,
   IResults,
-  IRequestHeaderOptions,
+  IRawHeaderOptions,
   IRequestBodyOptions,
   IResponseBodyOptions,
-  IResponseHeaderOptions,
   IResponseStatusOptions,
   RawDocData,
   IRequestParameters,
@@ -15,7 +14,7 @@ import { IsString } from '../Common/Validation/TypeChecks'
 
 export type DynamicParameter<T> = T | string
 
-export interface IHeaderStorage extends IRequestHeaderOptions {
+export interface IHeaderStorage extends IRawHeaderOptions {
   name: string
   value: any
 }
@@ -71,7 +70,7 @@ export class RequestWrapper {
       if (IsString(options)) {
         this.requestHeaders.add({ name, value, description: options as string })
       } else {
-        this.requestHeaders.add({ name, value, ...(options as IRequestHeaderOptions) })
+        this.requestHeaders.add({ name, value, ...(options as IRawHeaderOptions) })
       }
     } else {
       this.requestHeaders.add({ name, value })
@@ -130,12 +129,12 @@ export class RequestWrapper {
    * @param value The value of the header
    * @param options Additional configuration options
    */
-  public expectHeader(name: string, value: any, options?: DynamicParameter<IResponseHeaderOptions>) {
+  public expectHeader(name: string, value: any, options?: DynamicParameter<IRawHeaderOptions>) {
     if (options) {
       if (IsString(options)) {
         this.responseHeaders.add({ name, value, description: options as string })
       } else {
-        this.responseHeaders.add({ name, value, ...(options as IResponseHeaderOptions) })
+        this.responseHeaders.add({ name, value, ...(options as IRawHeaderOptions) })
       }
     } else {
       this.responseHeaders.add({ name, value })
