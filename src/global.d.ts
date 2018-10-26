@@ -1,1 +1,1 @@
-declare module 'flatted/esm'
+declare module 'circular-json-es6'

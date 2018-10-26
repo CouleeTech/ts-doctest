@@ -1,4 +1,4 @@
-import { parse, stringify } from 'flatted/esm'
+import * as CircularJSON from 'circular-json-es6'
 
 import {
   IResponseBody,
@@ -226,9 +226,9 @@ export class RequestWrapper {
     // TODO : Add validation to check for errors in the response object
     // TODO : Add ways to parse response types other than JSON
 
-    const rawData = parse(stringify(response))
+    const rawData = Flatted.parse(Flatted.stringify(response))
     const { text, req, header, ...everythingElse } = rawData
-    const body = parse(text)
+    const body = Flatted.parse(text)
     const result = { req, res: { body, headers: header, ...everythingElse } }
     return result
   }
