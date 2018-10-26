@@ -1,6 +1,6 @@
 {
   "name": "ts-doctest",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "combines api end-to-end testing with documentation generation",
   "main": "lib/index",
   "types": "lib/index",
