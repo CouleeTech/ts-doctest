@@ -1,3 +1,5 @@
+import * as CircularJSON from 'circular-json-es6'
+
 import {
   IResponseBody,
   IRequestBody,
@@ -224,9 +226,9 @@ export class RequestWrapper {
     // TODO : Add validation to check for errors in the response object
     // TODO : Add ways to parse response types other than JSON
 
-    const rawData = JSON.parse(JSON.stringify(response))
+    const rawData = CircularJSON.parse(CircularJSON.stringify(response))
     const { text, req, header, ...everythingElse } = rawData
-    const body = JSON.parse(text)
+    const body = CircularJSON.parse(text)
     const result = { req, res: { body, headers: header, ...everythingElse } }
     return result
   }
