@@ -226,8 +226,12 @@ export class RequestWrapper {
 
     const rawData = JSON.parse(JSON.stringify(response))
     const { text, req, header, ...everythingElse } = rawData
-    const body = JSON.parse(text)
-    const result = { req, res: { body, headers: header, ...everythingElse } }
+
+    const res = text
+      ? { body: JSON.parse(text), headers: header, ...everythingElse }
+      : { headers: header, ...everythingElse }
+
+    const result = { req, res }
     return result
   }
 }
