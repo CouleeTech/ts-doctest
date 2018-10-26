@@ -1,4 +1,4 @@
-import * as stringify from 'json-stringify-safe'
+import { parse, stringify } from 'flatted/esm'
 
 import {
   IResponseBody,
@@ -226,9 +226,9 @@ export class RequestWrapper {
     // TODO : Add validation to check for errors in the response object
     // TODO : Add ways to parse response types other than JSON
 
-    const rawData = JSON.parse(stringify(response))
+    const rawData = parse(stringify(response))
     const { text, req, header, ...everythingElse } = rawData
-    const body = JSON.parse(text)
+    const body = parse(text)
     const result = { req, res: { body, headers: header, ...everythingElse } }
     return result
   }
