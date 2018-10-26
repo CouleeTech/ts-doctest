@@ -1,3 +1,5 @@
+import * as stringify from 'json-stringify-safe'
+
 import {
   IResponseBody,
   IRequestBody,
@@ -9,6 +11,7 @@ import {
   IResponseStatusOptions,
   RawDocData,
   IRequestParameters,
+  IRequestHeaders,
 } from '../Common/RawDocs.Interface'
 import { IsString } from '../Common/Validation/TypeChecks'
 
@@ -180,12 +183,12 @@ export class RequestWrapper {
 
       for (const reqHeader of this.requestHeaders.values()) {
         const { name, value, ...options } = reqHeader
-        docs.requestHeaders[name] = { value, ...options }
+        docs.requestHeaders![name] = { value, ...options }
       }
     }
 
     if (this.responseHeaders.size > 0) {
-      docs.responseHeaders = {}
+      docs.responseHeaders = {} as IRequestHeaders
 
       for (const resHeader of this.responseHeaders.values()) {
         const { name, value, ...options } = resHeader
@@ -222,7 +225,8 @@ export class RequestWrapper {
   private static ParseRawResponse(response: any) {
     // TODO : Add validation to check for errors in the response object
     // TODO : Add ways to parse response types other than JSON
-    const rawData = JSON.parse(JSON.stringify(response))
+
+    const rawData = JSON.parse(stringify(response))
     const { text, req, header, ...everythingElse } = rawData
     const body = JSON.parse(text)
     const result = { req, res: { body, headers: header, ...everythingElse } }

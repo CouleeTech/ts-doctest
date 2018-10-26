@@ -24,6 +24,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.5",
+    "@types/json-stringify-safe": "^5.0.0",
     "@types/node": "^10.11.7",
     "@types/superagent": "^3.8.4",
     "@types/supertest": "^2.0.6",
