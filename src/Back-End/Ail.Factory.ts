@@ -19,7 +19,7 @@ import { HttpMethodWithRequestBody } from '../Common/Http'
 import { SimpleParameterString } from '../Common/Util/ParameterString.Builder.'
 
 // The headers should be filtered out if included with raw API data
-const BANNED_HEADERS = ['x-powered-by', 'etag', 'connection']
+const BANNED_HEADERS = ['x-powered-by', 'etag', 'connection', 'user-agent']
 
 /**
  * Used to create AIL JSON objects
