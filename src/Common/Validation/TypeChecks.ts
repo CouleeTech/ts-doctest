@@ -13,7 +13,7 @@ export function IsArray(value: any): value is any[] {
  * @param value The value to be checked
  */
 export function IsFalsy(value: any): value is false {
-  return !value
+  return Boolean(value)
 }
 
 /**
@@ -23,6 +23,24 @@ export function IsFalsy(value: any): value is false {
  */
 export function IsFunction(value: any): value is (...args: any) => any {
   return typeof value === 'function'
+}
+
+/**
+ * Validate that the value is null
+ *
+ * @param value The value to be checked
+ */
+export function IsNull(value: any): value is null {
+  return value === null
+}
+
+/**
+ * Validate that the value is null or undefined
+ *
+ * @param value The value to be checked
+ */
+export function IsNullOrUndefined(value: any): value is null {
+  return IsNull(value) || IsUndefined(value)
 }
 
 /**
@@ -50,4 +68,13 @@ export function IsObject(value: any): value is { [key: string]: any } {
  */
 export function IsString(value: any): value is string {
   return typeof value === 'string' || value instanceof String
+}
+
+/**
+ * Validate that the value is undefined
+ *
+ * @param value The value to be checked
+ */
+export function IsUndefined(value: any): value is undefined {
+  return typeof value === 'undefined'
 }
