@@ -4,6 +4,7 @@ import { Response } from 'superagent'
 import { RawDocContainer } from '../Common/RawDocs.Container'
 import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http'
 import { RawDocData, IRequestParameters } from '../Common/RawDocs.Interface'
+import { IsFunction, IsObject, IsArray } from '../Common/Validation/TypeChecks'
 
 import { IApplication } from './Application.Interface'
 import { RequestWrapper } from './Request.Wrapper'
@@ -162,6 +163,7 @@ export abstract class ControllerTestSuite {
                 config.query || path.templates
                   ? new RequestWrapper(path.name, reqTestObject, requestWrapperParams)
                   : new RequestWrapper(path.name, reqTestObject)
+
               this.requestWrappers.add(reqWrapper)
               await generator(reqWrapper)()
             })
@@ -171,10 +173,12 @@ export abstract class ControllerTestSuite {
         afterAll(async () => {
           await this.afterAll()
           await this.app.close()
+
           for (const reqWrapper of this.requestWrappers.values()) {
             const rawDocs: RawDocData = reqWrapper.exportRequestDocs()
             this.resultContainer.save(rawDocs)
           }
+
           await AilManager.ConsumeContainer(this.resultContainer)
         })
       })
@@ -282,7 +286,7 @@ export abstract class ControllerTestSuite {
     let queryString = ''
 
     if (IsArray(value)) {
-      for (const [index, item] of value.entries() as any[]) {
+      for (const [index, item] of value.entries()) {
         queryString += `${key}[${index}]=${item}&`
       }
     } else if (IsObject(value)) {
@@ -465,31 +469,4 @@ export class TestSuitePath {
     }
     return { description: this.config.description }
   }
-}
-
-/**
- * Check if the value is an object
- *
- * @param value The value that is being checked
- */
-function IsObject(value: any) {
-  return value && typeof value === 'object' && value.constructor === Object
-}
-
-/**
- * Check if the value is an array
- *
- * @param value The value that is being checked
- */
-function IsArray(value: any) {
-  return Array.isArray(value)
-}
-
-/**
- * Check if the value is a function
- *
- * @param value The value that is being checked
- */
-function IsFunction(value: any) {
-  return typeof value === 'function'
 }

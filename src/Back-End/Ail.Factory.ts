@@ -83,7 +83,7 @@ export class AilFactory {
     const operations: IOperationObjectCollection = {}
 
     for (const value of rawData) {
-      const type = value.results!.req.method.toLowerCase()
+      const type = value.results.req.method.toLowerCase()
 
       // Each Operation object should have only one array per HTTP method
       if (!operations[type]) {
@@ -95,7 +95,7 @@ export class AilFactory {
       const operationType: OperationObject = {
         responses: [
           {
-            [value.results!.res.status]: this.ResponseObjectFromRawData(value),
+            [value.results.res.status]: this.ResponseObjectFromRawData(value),
           },
         ],
       }
