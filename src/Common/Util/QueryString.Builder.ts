@@ -1,7 +1,7 @@
 import { FormParameterString, DeepObjectParameterString } from './ParameterString.Builder'
-import { IsNumber, IsNullOrUndefined, IsString, IsObject, IsArray } from '../Validation'
+import { IsNumber, IsNullOrUndefined, IsString, IsObject, IsArray, IsFalsy } from '../Validation'
 
-export type QuerySimpleValue = string | number | null
+export type QuerySimpleValue = string | number | null | undefined
 
 export type QueryArrayValue = QuerySimpleValue[]
 
@@ -35,6 +35,12 @@ export type QueryPairs = IQueryPair[]
 
 export type QueryStringConfig = IQueryPair | QueryPairs
 
+export class QueryStringBuilderException extends Error {
+  public constructor(message: string) {
+    super(message)
+  }
+}
+
 /**
  * Builds a query string to be used in URLs and documentation
  *
@@ -45,7 +51,14 @@ export type QueryStringConfig = IQueryPair | QueryPairs
  * @param config All of the key value pairs associated with the query string
  */
 export function BuildQueryString(config: QueryStringConfig): string {
+  if (IsFalsy(config)) {
+    throw new QueryStringBuilderException('Building a query string requires a valid query config.')
+  }
+
   if (IsQueryPairArray(config)) {
+    if (config.length < 1) {
+      throw new QueryStringBuilderException('A query string config cannot be an empty array.')
+    }
     return `?${config.map(pair => ParseQueryValuePair(pair)).join('&')}`
   } else {
     return `?${ParseQueryValuePair(config)}`
@@ -68,7 +81,7 @@ function ParseQueryValuePair(pair: IQueryPair): string {
     return ParseObjectValuePair(pair)
   }
 
-  throw new Error('Failed to parse a query value pair. The pair is in an invalid type.')
+  throw new QueryStringBuilderException('Failed to parse a query value pair. The pair is in an invalid type.')
 }
 
 /**

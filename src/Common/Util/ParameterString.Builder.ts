@@ -203,7 +203,7 @@ export function DeepObjectParameterString(name: string, value: any) {
     NotAcceptable('Array', 'deep object')
   } else if (IsObject(value)) {
     return `${Object.keys(value)
-      .map(key => `${name}[${key}]=${value[key]}`)
+      .map(key => (value[key] ? `${name}[${key}]=${value[key]}` : `${name}[${key}]=`))
       .join('&')}`
   }
 

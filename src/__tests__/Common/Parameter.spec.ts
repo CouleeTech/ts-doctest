@@ -7,7 +7,7 @@ import {
   SpaceDelimitedParameterString,
   PipeDelimitedParameterString,
   DeepObjectParameterString,
-} from '../../Common/Util/ParameterString.Builder.'
+} from '../../Common/Util/ParameterString.Builder'
 
 const testName = 'color'
 const emptyValue: any = false

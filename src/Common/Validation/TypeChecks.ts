@@ -13,7 +13,7 @@ export function IsArray(value: any): value is any[] {
  * @param value The value to be checked
  */
 export function IsFalsy(value: any): value is false {
-  return Boolean(value)
+  return !Boolean(value)
 }
 
 /**
