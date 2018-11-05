@@ -19,7 +19,7 @@ import { HttpMethodWithRequestBody } from '../Common/Http'
 import { SimpleParameterString } from '../Common/Util/ParameterString.Builder'
 
 // The headers should be filtered out if included with raw API data
-const BANNED_HEADERS = ['x-powered-by', 'etag', 'connection', 'user-agent']
+const FILTERED_HEADERS = ['x-powered-by', 'etag', 'connection', 'user-agent']
 
 /**
  * Used to create AIL JSON objects
@@ -211,7 +211,7 @@ export class AilFactory {
     headerDetails?: { [name: string]: IRawHeader },
   ): ParameterObject[] {
     const formattedHeaders: ParameterObject[] = Object.keys(headers)
-      .filter(header => !BANNED_HEADERS.includes(header))
+      .filter(header => !FILTERED_HEADERS.includes(header))
       .map(header => {
         if (headerDetails && headerDetails[header]) {
           const { value, ...options } = headerDetails[header]

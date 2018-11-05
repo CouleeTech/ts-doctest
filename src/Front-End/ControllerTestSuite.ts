@@ -9,6 +9,7 @@ import { IsFunction, IsObject, IsArray } from '../Common/Validation/TypeChecks'
 import { IApplication } from './Application.Interface'
 import { RequestWrapper } from './Request.Wrapper'
 import { AilManager } from '../Back-End/Ail.Manager'
+import { TestSuiteException } from './TestSuite.Exception'
 
 export interface ITestSuiteInfo {
   controller: string
@@ -332,26 +333,12 @@ export class TestSuitePath {
 
   // ~~~ Path Operation Building Methods ~~~ //
 
-  // TODO : Refactor the body of 'get', 'post', 'put', and 'delete' into a more generic function
   public get(
     config: IOperationConfig | string,
     second: IOperationTemplates | ResponseGenerator,
     third?: ResponseGenerator,
   ) {
-    if (typeof config === 'string') {
-      config = { name: config }
-    }
-
-    if (IsFunction(second)) {
-      this.getOperations.set(config.name, { config, generator: second as ResponseGenerator })
-    } else if (third && IsFunction(third)) {
-      config.templates = second
-      this.getOperations.set(config.name, { config, generator: third })
-    } else {
-      throw new Error('Missing a valid response generator function.')
-    }
-
-    return this
+    return this.operation(HttpRequestMethods.GET, config, second, third)
   }
 
   public post(
@@ -359,20 +346,7 @@ export class TestSuitePath {
     second: IOperationTemplates | ResponseGenerator,
     third?: ResponseGenerator,
   ) {
-    if (typeof config === 'string') {
-      config = { name: config }
-    }
-
-    if (IsFunction(second)) {
-      this.postOperations.set(config.name, { config, generator: second as ResponseGenerator })
-    } else if (third && IsFunction(third)) {
-      config.templates = second
-      this.postOperations.set(config.name, { config, generator: third })
-    } else {
-      throw new Error('Missing a valid response generator function.')
-    }
-
-    return this
+    return this.operation(HttpRequestMethods.POST, config, second, third)
   }
 
   public put(
@@ -380,20 +354,7 @@ export class TestSuitePath {
     second: IOperationTemplates | ResponseGenerator,
     third?: ResponseGenerator,
   ) {
-    if (typeof config === 'string') {
-      config = { name: config }
-    }
-
-    if (IsFunction(second)) {
-      this.putOperations.set(config.name, { config, generator: second as ResponseGenerator })
-    } else if (third && IsFunction(third)) {
-      config.templates = second
-      this.putOperations.set(config.name, { config, generator: third })
-    } else {
-      throw new Error('Missing a valid response generator function.')
-    }
-
-    return this
+    return this.operation(HttpRequestMethods.PUT, config, second, third)
   }
 
   public delete(
@@ -401,20 +362,7 @@ export class TestSuitePath {
     second: IOperationTemplates | ResponseGenerator,
     third?: ResponseGenerator,
   ) {
-    if (typeof config === 'string') {
-      config = { name: config }
-    }
-
-    if (IsFunction(second)) {
-      this.deleteOperations.set(config.name, { config, generator: second as ResponseGenerator })
-    } else if (third && IsFunction(third)) {
-      config.templates = second
-      this.deleteOperations.set(config.name, { config, generator: third })
-    } else {
-      throw new Error('Missing a valid response generator function.')
-    }
-
-    return this
+    return this.operation(HttpRequestMethods.DELETE, config, second, third)
   }
 
   public get templates() {
@@ -468,5 +416,46 @@ export class TestSuitePath {
       throw new Error('Tried to export an uninitialized test suite path.')
     }
     return { description: this.config.description }
+  }
+
+  // ~~~ Private Methods ~~~ //
+
+  private operation(
+    type: HttpRequestMethods,
+    config: IOperationConfig | string,
+    second: IOperationTemplates | ResponseGenerator,
+    third?: ResponseGenerator,
+  ) {
+    if (typeof config === 'string') {
+      config = { name: config }
+    }
+
+    const operationSet = this.getOperationSet(type)
+
+    if (IsFunction(second)) {
+      operationSet.set(config.name, { config, generator: second as ResponseGenerator })
+    } else if (third && IsFunction(third)) {
+      config.templates = second
+      operationSet.set(config.name, { config, generator: third })
+    } else {
+      throw new Error('Missing a valid response generator function.')
+    }
+
+    return this
+  }
+
+  private getOperationSet(type: HttpRequestMethods): Map<string, IPathOperation> {
+    switch (type) {
+      case HttpRequestMethods.POST:
+        return this.postOperations
+      case HttpRequestMethods.GET:
+        return this.getOperations
+      case HttpRequestMethods.PUT:
+        return this.putOperations
+      case HttpRequestMethods.DELETE:
+        return this.deleteOperations
+      default:
+        throw new TestSuiteException(`The HTTP ${type} is not yet supported as a test suite operation.`)
+    }
   }
 }
