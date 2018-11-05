@@ -1,14 +1,15 @@
-import * as supertest from 'supertest'
 import { Response } from 'superagent'
+import * as supertest from 'supertest'
 
-import { RawDocContainer } from '../Common/RawDocs.Container'
 import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http'
+import { RawDocContainer } from '../Common/RawDocs.Container'
 import { RawDocData, IRequestParameters } from '../Common/RawDocs.Interface'
-import { IsFunction, IsObject, IsArray } from '../Common/Validation/TypeChecks'
+import { IsFunction } from '../Common/Validation/TypeChecks'
 
+import { QueryStringConfig, BuildQueryString } from '../Common/Util/QueryString.Builder'
+import { AilManager } from '../Back-End/Ail.Manager'
 import { IApplication } from './Application.Interface'
 import { RequestWrapper } from './Request.Wrapper'
-import { AilManager } from '../Back-End/Ail.Manager'
 import { TestSuiteException } from './TestSuite.Exception'
 
 export interface ITestSuiteInfo {
@@ -30,20 +31,15 @@ export interface IOperationTemplates {
   [key: string]: any
 }
 
-export interface IOperationQuery {
-  key: string
-  value: any
-}
-
 export interface IOperationConfig {
   name: string
   description?: string
-  query?: IOperationQuery | IOperationQuery[]
+  query?: QueryStringConfig
   templates?: IOperationTemplates
 }
 
 /**
- * The primary interface for the creating end-to-end test suites used for testing and documenting API controllers
+ * The primary interface for the creating end-to-end test suites used for testing and documenting API endpoints
  *
  * Each test suite should represent one and only one controller. Also, in regards to documentation, there should
  * only ever be one test suite per controller. Use this class by extending it and implementing its abstract methods.
@@ -103,16 +99,14 @@ export abstract class ControllerTestSuite {
           await this.app.init()
         })
 
-        console.log('Building Test Suite')
-
         for (const path of this.paths.values()) {
           const tests = path.initialize()
 
           for (const [method, name, { config, generator }] of tests) {
             it(name, async () => {
               const req = await supertest(this.httpServer)
-
               let templatedPathName: string = path.name
+
               if (path.templates) {
                 if (!config.templates) {
                   throw new Error(`The ${name} operation on the ${path.name} path provided no template values.`)
@@ -128,10 +122,9 @@ export abstract class ControllerTestSuite {
                 }
               }
 
-              const pathName = ControllerTestSuite.ConfigurePathQuery({
-                base: templatedPathName,
-                config,
-              })
+              const pathName = config.query
+                ? `${templatedPathName}${BuildQueryString(config.query)}`
+                : templatedPathName
 
               let reqTestObject = null
               switch (method) {
@@ -243,62 +236,6 @@ export abstract class ControllerTestSuite {
    */
   private static CheckForPathTemplates(name: string): string[] | null {
     return name.match(/((?<=\{)\w+(?=\}))/g)
-  }
-
-  /**
-   * Handles the logic of building query strings for requests
-   *
-   * @param base The base name of the request path
-   * @param config The operation configuration associated with the request
-   */
-  private static ConfigurePathQuery({ base, config }: { base: string; config: IOperationConfig }): string {
-    if (!config.query) {
-      return base
-    }
-
-    let queryString = '?'
-
-    if (IsObject(config.query)) {
-      const { key, value } = config.query as IOperationQuery
-      queryString += this.ToQueryString(key, value)
-    } else if (IsArray(config.query)) {
-      const valueSet = new Set<string>()
-
-      for (const item of config.query as IOperationQuery[]) {
-        const { key, value } = item
-        if (valueSet.has(key)) {
-          throw new Error('Duplicate Query String Parameter!')
-        }
-        valueSet.add(key)
-        queryString += this.ToQueryString(key, value)
-      }
-    } else {
-      throw new Error('Invalid Request Query!')
-    }
-
-    if (queryString === '?') {
-      throw new Error('Empty Query String!')
-    }
-
-    return `${base}${queryString.slice(0, -1)}`
-  }
-
-  private static ToQueryString(key: string, value: any): string {
-    let queryString = ''
-
-    if (IsArray(value)) {
-      for (const [index, item] of value.entries()) {
-        queryString += `${key}[${index}]=${item}&`
-      }
-    } else if (IsObject(value)) {
-      for (const valueKey of Object.keys(value)) {
-        queryString += `${key}[${valueKey}]=${value[valueKey]}&`
-      }
-    } else {
-      queryString += `${key}=${value}&`
-    }
-
-    return queryString
   }
 }
 
