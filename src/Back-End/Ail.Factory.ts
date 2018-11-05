@@ -17,6 +17,7 @@ import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunct
 import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
 import { HttpMethodWithRequestBody } from '../Common/Http'
 import { SimpleParameterString } from '../Common/Util/ParameterString.Builder'
+import { BuildQueryString, IsQueryPairArray, QueryStringConfig } from '../Common/Util/QueryString.Builder'
 
 // The headers should be filtered out if included with raw API data
 const FILTERED_HEADERS = ['x-powered-by', 'etag', 'connection', 'user-agent']
@@ -137,13 +138,13 @@ export class AilFactory {
     }
 
     if (rawData.parameters!.queryParameters) {
-      const queryParams = rawData.parameters!.queryParameters
-      if (IsArray(queryParams)) {
+      const queryParams = rawData.parameters!.queryParameters as QueryStringConfig
+      if (IsQueryPairArray(queryParams)) {
         for (const queryParam of queryParams) {
-          parameters.push({ name: queryParam.key, in: 'query', example: queryParam.value })
+          parameters.push({ name: queryParam.key, in: 'query', example: BuildQueryString(queryParam) })
         }
       } else {
-        parameters.push({ name: queryParams.key, in: 'query', example: queryParams.value })
+        parameters.push({ name: queryParams.key, in: 'query', example: BuildQueryString(queryParams) })
       }
     }
 

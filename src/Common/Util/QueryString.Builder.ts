@@ -65,6 +65,26 @@ export function BuildQueryString(config: QueryStringConfig): string {
   }
 }
 
+/* ~~ Public Type Checkers ~~ */
+
+/**
+ * Check whether or not a query config is an array of query pairs
+ *
+ * @param config The query config being checked
+ */
+export function IsQueryPairArray(config: QueryStringConfig): config is QueryPairs {
+  return IsArray(config)
+}
+
+/**
+ * Check whether or not a query config is a single query pair
+ *
+ * @param config The query config being checked
+ */
+export function IsSingleQueryPair(config: QueryStringConfig): config is IQueryPair {
+  return IsArray(config)
+}
+
 /* ~~ Query Value Parsers ~~ */
 
 /**
@@ -141,13 +161,4 @@ function IsArrayValuePair(pair: IQueryPair): pair is IArrayQueryPair {
  */
 function IsObjectValuePair(pair: IQueryPair): pair is IObjectQueryPair {
   return IsObject(pair.value)
-}
-
-/**
- * Check whether or not a query config is an array of query pairs
- *
- * @param config The query config being checked
- */
-function IsQueryPairArray(config: QueryStringConfig): config is QueryPairs {
-  return IsArray(config)
 }

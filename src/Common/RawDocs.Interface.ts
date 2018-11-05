@@ -1,10 +1,12 @@
-// Request Parameters
+import { QueryStringConfig } from './Util/QueryString.Builder'
+
+// ~~~ Request Parameters ~~~ //
 export interface IRequestParameters {
-  queryParameters?: any
+  queryParameters?: QueryStringConfig
   pathParameters?: any
 }
 
-// Header
+// ~~~ Header ~~~ //
 export interface IRawHeaderOptions {
   deprecated?: boolean
   description?: string
@@ -15,9 +17,10 @@ export interface IRawHeader extends IRawHeaderOptions {
   value: string
 }
 
-// Request Header
+// ~~~ Request Header ~~~ //
 export interface IRequestHeader extends IRawHeader {}
-// Request Body
+
+// ~~~ Request Body ~~~ //
 export interface IRequestBodyOptions {
   description?: string
 }
@@ -26,10 +29,10 @@ export interface IRequestBody extends IRequestBodyOptions {
   data: any
 }
 
-// Response Header
+// ~~~ Response Header ~~~ //
 export interface IResponseHeader extends IRawHeader {}
 
-// Response Body
+// ~~~ Response Body ~~~ //
 export interface IResponseBodyOptions {
   description?: string
 }
@@ -38,7 +41,7 @@ export interface IResponseBody extends IResponseBodyOptions {
   data: any
 }
 
-// Response Status
+// ~~~ Response Status ~~~ //
 export interface IResponseStatusOptions {
   description?: string
 }
@@ -55,7 +58,7 @@ export interface IResponseHeaders {
   [name: string]: IResponseHeader
 }
 
-// Results
+// ~~~ Results ~~~ //
 
 export interface IResults {
   req: any
