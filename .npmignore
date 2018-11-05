@@ -3,3 +3,15 @@ tsconfig.json
 tslint.json
 .prettierrc
 jestconfig.json
+.DS_Store
+.github
+.gitmodules
+.gitattributes
+.eslintrc.json
+.npmrc
+test
+coverage
+.vscode
+tscache
+.tslintrc
+.editorconfig
