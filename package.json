@@ -2,6 +2,20 @@
   "name": "ts-doctest",
   "version": "0.0.26",
   "description": "combines api end-to-end testing with documentation generation",
+  "keywords": [
+    "cli",
+    "typescript",
+    "doctest",
+    "ts-doctest",
+    "api",
+    "e2e",
+    "test",
+    "tests",
+    "testing",
+    "end-to-end",
+    "documentation",
+    "generation"
+  ],
   "main": "lib/index",
   "types": "lib/index",
   "bin": {
@@ -10,6 +24,7 @@
   "scripts": {
     "build": "tsc --p ./tsconfig.json",
     "dev": "tsc --p ./tsconfig.json --watch",
+    "doctest": "doctest",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "postversion": "git push && git push --tags",
@@ -38,6 +53,7 @@
     "typescript": "^3.1.6"
   },
   "dependencies": {
+    "commander": "^2.19.0",
     "openapi3-ts": "^1.1.0",
     "superagent": "^4.0.0-beta.5",
     "supertest": "^3.3.0"
