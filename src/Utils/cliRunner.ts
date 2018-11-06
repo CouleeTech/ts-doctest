@@ -1,4 +1,6 @@
+import { spawn } from 'child_process'
 import * as fs from 'fs'
+import * as path from 'path'
 
 export interface IOptions {
   /**
@@ -35,7 +37,7 @@ export class FatalError extends Error {
 
 export async function run(options: IOptions, logger: ILogger): Promise<Status> {
   try {
-    return await runWorker(options /*logger*/)
+    return await runWorker(options, logger)
   } catch (error) {
     if (error instanceof FatalError) {
       logger.error(`${error.message}\n`)
@@ -45,17 +47,46 @@ export async function run(options: IOptions, logger: ILogger): Promise<Status> {
   }
 }
 
-async function runWorker(options: IOptions /*logger: ILogger*/): Promise<Status> {
-  if (options.config && !fs.existsSync(options.config)) {
-    throw new FatalError(`Invalid option for configuration: ${options.config}`)
+async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
+  if (!options.config) {
+    throw new FatalError(`ts-doctest requires a valid configration`)
   }
 
-  // TODO : Make this function run ts-jest
-  // const results = {} as any
-  // const { output, errorCount } = await results
-  // if (output && output.trim()) {
-  //   logger.log(`${output}\n`)
-  // }
-  // return errorCount === 0 ? Status.Ok : Status.FatalError
+  const invokerPath = path.resolve('.')
+  const configPath = `${invokerPath}/${options.config}`
+
+  if (!fs.existsSync(configPath)) {
+    throw new FatalError(`Invalid option for configuration. File not found: ${configPath}`)
+  }
+
+  await runTests(configPath)
+  logger.log('Testing Complete. Generating Documentation.\n')
+
   return Status.Ok
+}
+
+async function runTests(configPath: string) {
+  const invokerPath = path.resolve('.')
+  const nodeModules = `${invokerPath}/node_modules`
+  const jestPath = `${nodeModules}/jest/bin/jest.js`
+
+  const runner = spawn(`${jestPath} --config=${configPath}`, {
+    stdio: 'inherit',
+    shell: true,
+  } as any)
+
+  let results: any
+  const stdout: string[] = []
+
+  runner.on('message', data => {
+    results = data
+  })
+
+  runner.on('exit', code => {
+    if (code !== 0) {
+      throw new Error()
+    } else {
+      return { results, stdout: stdout.join('') }
+    }
+  })
 }
