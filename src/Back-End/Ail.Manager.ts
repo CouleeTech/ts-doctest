@@ -3,16 +3,10 @@ import * as fs from 'fs'
 import { IsObject, IsString } from '../Common'
 import { RawDocContainer } from '../Common/RawDocs.Container'
 
+import { AilStorageEngineType, DEFAULT_CONFIG_PATH } from '../Config/Config'
 import { AilFactory } from './Ail.Factory'
 import { IAilJson } from './Interfaces/Ail.Factory.Interfaces'
-
-/**
- * The storage engine used for AIL objects
- */
-export enum AilStorageEngineType {
-  FILE = 'FILE',
-  MEMORY = 'MEMORY'
-}
+import { GetJsonFileSync, GetFullPath } from '../Common/Util/FileUtils'
 
 /**
  * A configuration object used to initialize the AilManager
@@ -31,7 +25,6 @@ export interface IAilManagerConfig {
 export class AilManager {
   private static ALLOWED_ENGINE_TYPES = ['FILE', 'MEMORY']
   private static CONFIG: IAilManagerConfig
-  private static DEFAULT_CONFIG_PATH = './doctest.json'
   private static INITIALIZED = false
   private static MEMORY_RESULTS: Map<string, IAilJson>
 
@@ -74,7 +67,7 @@ export class AilManager {
     if (!option || IsString(option)) {
       const config = option ? this.GetConfigFromFilesystem(option as string) : this.GetConfigFromFilesystem()
       if (!config) {
-        throw new Error(`No configuration was supplied and no ${this.DEFAULT_CONFIG_PATH} file could be found`)
+        throw new Error(`No configuration was supplied and no ${DEFAULT_CONFIG_PATH} file could be found`)
       }
       this.CONFIG = config
     } else if (IsObject(option)) {
@@ -141,20 +134,8 @@ export class AilManager {
    * @param customPath An optional custom path to the configuration file
    */
   private static GetConfigFromFilesystem(customPath?: string): IAilManagerConfig | null {
-    const configPath = customPath ? customPath : this.DEFAULT_CONFIG_PATH
-    try {
-      const stats = fs.statSync(configPath)
-
-      if (!stats.isFile()) {
-        return null
-      }
-
-      const rawConfig: string = fs.readFileSync(configPath, 'utf8')
-      const config = JSON.parse(rawConfig)
-      return config
-    } catch (e) {
-      return null
-    }
+    const configPath = customPath ? customPath : GetFullPath(DEFAULT_CONFIG_PATH)
+    return GetJsonFileSync(configPath)
   }
 
   /**

@@ -28,6 +28,18 @@ export function GetFullPath(filePath: string) {
   return `${BASE_PATH}/${pathString}`
 }
 
+export async function GetJsonFile(filePath: string) {
+  VerifyFileExists(filePath)
+  const json = require(filePath)
+  return json
+}
+
+export function GetJsonFileSync(filePath: string) {
+  VerifyFileExists(filePath)
+  const json = require(filePath)
+  return json
+}
+
 /**
  * Verify whether or not a file exists
  *
