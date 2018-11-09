@@ -11,7 +11,7 @@ import { IAilJson } from './Interfaces/Ail.Factory.Interfaces'
  */
 export enum AilStorageEngineType {
   FILE = 'FILE',
-  MEMORY = 'MEMORY',
+  MEMORY = 'MEMORY'
 }
 
 /**
@@ -218,7 +218,7 @@ export class AilManager {
             throw new Error(`Failed the write the following Api result file: ${resultFile}`)
           }
           console.log(`Wrote the ${controller} controller's API results to the following file: ${resultFile}`)
-        }),
+        })
       )
     }
   }

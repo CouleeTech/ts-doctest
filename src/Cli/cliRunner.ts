@@ -21,7 +21,7 @@ export interface IOptions {
 
 export const enum Status {
   Ok = 0,
-  FatalError = 1,
+  FatalError = 1
 }
 
 export interface ILogger {
@@ -54,7 +54,7 @@ async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
   const doctestConfigPath = options.doctestConfig ? GetFullPath(options.doctestConfig) : GetFullPath('doctest.json')
   VerifyFileExists(
     doctestConfigPath,
-    `Invalid path for the doctest configuration file. File not found: ${doctestConfigPath}`,
+    `Invalid path for the doctest configuration file. File not found: ${doctestConfigPath}`
   )
 
   if (options.jestConfig) {
@@ -77,7 +77,7 @@ async function runTests(logger: ILogger, jestConfigPath?: string) {
 
   const runner = spawn(command, {
     stdio: 'inherit',
-    shell: true,
+    shell: true
   } as any)
 
   let results: any

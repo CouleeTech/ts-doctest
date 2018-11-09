@@ -6,7 +6,7 @@ import {
   RequestBodyObject,
   MediaTypeObject,
   ParameterObject,
-  ParameterLocation,
+  ParameterLocation
 } from 'openapi3-ts'
 
 import { ContainerPaths } from '../Common/RawDocs.Container'
@@ -51,7 +51,7 @@ export class AilFactory {
       paths: rawPaths.map(([path, rawData]) => {
         this.ValidateRawData(path, rawData)
         return this.RawPathToAil(path, rawData)
-      }),
+      })
     }
 
     return ailJson
@@ -65,11 +65,11 @@ export class AilFactory {
    */
   protected static RawPathToAil(path: string, rawData: RawDocData[]): PathsObject {
     const pathAilItem: PathItemObject = {
-      ...this.RawOperationsToAil(rawData),
+      ...this.RawOperationsToAil(rawData)
     }
 
     const pathAil: PathsObject = {
-      [path]: pathAilItem,
+      [path]: pathAilItem
     }
 
     return pathAil
@@ -96,9 +96,9 @@ export class AilFactory {
       const operationType: OperationObject = {
         responses: [
           {
-            [value.results.res.status]: this.ResponseObjectFromRawData(value),
-          },
-        ],
+            [value.results.res.status]: this.ResponseObjectFromRawData(value)
+          }
+        ]
       }
 
       if (HttpMethodWithRequestBody(type)) {
@@ -165,7 +165,7 @@ export class AilFactory {
         ? {
             content: AilFactory.JsonContent(rawData.results.req.data),
             description: rawData.requestBody.description,
-            required: true,
+            required: true
           }
         : { content: AilFactory.JsonContent(rawData.results.req.data), required: true }
 
@@ -209,7 +209,7 @@ export class AilFactory {
    */
   protected static ParseRawHeaders(
     headers: { [name: string]: string },
-    headerDetails?: { [name: string]: IRawHeader },
+    headerDetails?: { [name: string]: IRawHeader }
   ): ParameterObject[] {
     const formattedHeaders: ParameterObject[] = Object.keys(headers)
       .filter(header => !FILTERED_HEADERS.includes(header))
@@ -220,14 +220,14 @@ export class AilFactory {
             name: header,
             in: 'header' as ParameterLocation,
             example: SimpleParameterString(headers[header]),
-            ...options,
+            ...options
           }
         }
 
         return {
           name: header,
           in: 'header' as ParameterLocation,
-          example: SimpleParameterString(headers[header]),
+          example: SimpleParameterString(headers[header])
         }
       })
 

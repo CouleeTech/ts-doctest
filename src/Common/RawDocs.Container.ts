@@ -67,7 +67,7 @@ export class RawDocContainer {
     return {
       controller: this.controller,
       description: this.description || '',
-      paths: Array.from(this.data, ([path, data]) => [path, [...data.values()]]) as ContainerPaths,
+      paths: Array.from(this.data, ([path, data]) => [path, [...data.values()]]) as ContainerPaths
     }
   }
 }

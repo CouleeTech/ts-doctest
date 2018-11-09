@@ -115,7 +115,7 @@ export abstract class ControllerTestSuite {
                 for (const template of path.templates) {
                   if (!config.templates[template]) {
                     throw new Error(
-                      `The ${name} operation on the ${path.name} path is missing a template value for {${template}}.`,
+                      `The ${name} operation on the ${path.name} path is missing a template value for {${template}}.`
                     )
                   }
                   templatedPathName = path.name.replace(`{${template}}`, config.templates[template])
@@ -144,7 +144,7 @@ export abstract class ControllerTestSuite {
 
               if (!reqTestObject) {
                 throw new Error(
-                  `Failed to create a request test object for the ${name} operation on the ${path.name} path`,
+                  `Failed to create a request test object for the ${name} operation on the ${path.name} path`
                 )
               }
 
@@ -208,7 +208,7 @@ export abstract class ControllerTestSuite {
   private setAppBuilder(appBuilder: () => Promise<IApplication>) {
     if (this.app) {
       throw new Error(
-        `Tried to add an app object to the ${this.controller} ControllerTestSuite when it already has one.`,
+        `Tried to add an app object to the ${this.controller} ControllerTestSuite when it already has one.`
       )
     }
     this.appBuilder = appBuilder
@@ -273,7 +273,7 @@ export class TestSuitePath {
   public get(
     config: IOperationConfig | string,
     second: IOperationTemplates | ResponseGenerator,
-    third?: ResponseGenerator,
+    third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.GET, config, second, third)
   }
@@ -281,7 +281,7 @@ export class TestSuitePath {
   public post(
     config: IOperationConfig | string,
     second: IOperationTemplates | ResponseGenerator,
-    third?: ResponseGenerator,
+    third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.POST, config, second, third)
   }
@@ -289,7 +289,7 @@ export class TestSuitePath {
   public put(
     config: IOperationConfig | string,
     second: IOperationTemplates | ResponseGenerator,
-    third?: ResponseGenerator,
+    third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.PUT, config, second, third)
   }
@@ -297,7 +297,7 @@ export class TestSuitePath {
   public delete(
     config: IOperationConfig | string,
     second: IOperationTemplates | ResponseGenerator,
-    third?: ResponseGenerator,
+    third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.DELETE, config, second, third)
   }
@@ -361,7 +361,7 @@ export class TestSuitePath {
     type: HttpRequestMethods,
     config: IOperationConfig | string,
     second: IOperationTemplates | ResponseGenerator,
-    third?: ResponseGenerator,
+    third?: ResponseGenerator
   ) {
     if (typeof config === 'string') {
       config = { name: config }

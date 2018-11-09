@@ -9,7 +9,7 @@ import {
   IResponseStatusOptions,
   RawDocData,
   IRequestParameters,
-  IRequestHeaders,
+  IRequestHeaders
 } from '../Common/RawDocs.Interface'
 import { IsString } from '../Common/Validation/TypeChecks'
 

@@ -6,7 +6,7 @@ import {
   SimpleParameterString,
   SpaceDelimitedParameterString,
   PipeDelimitedParameterString,
-  DeepObjectParameterString,
+  DeepObjectParameterString
 } from '../../Common/Util/ParameterString.Builder'
 
 const testName = 'color'

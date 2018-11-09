@@ -9,8 +9,8 @@ describe('AIL Manager', () => {
   it('Should only be initialized once', () => {
     expect(() =>
       AilManager.Init({
-        storageEngine: AilStorageEngineType.MEMORY,
-      }),
+        storageEngine: AilStorageEngineType.MEMORY
+      })
     ).toThrow(Error)
   })
 

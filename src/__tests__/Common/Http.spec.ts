@@ -13,7 +13,7 @@ describe('Http', () => {
       'trace',
       'TRACE',
       'connect',
-      'CONNECT',
+      'CONNECT'
     ]
     for (const method of shouldBeTrue) {
       expect(HttpMethodWithRequestBody(method)).toBe(true)
