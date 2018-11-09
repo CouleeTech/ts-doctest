@@ -28,7 +28,7 @@ const options: IOption[] = [
     type: 'string',
     describe: 'doctest configuration file',
     description: Dedent`
-          The location of the configuration file that doctest will use.`,
+          The location of the configuration file that doctest will use.`
   },
   {
     short: 'jc',
@@ -36,7 +36,7 @@ const options: IOption[] = [
     type: 'string',
     describe: 'jest configuration file',
     description: Dedent`
-          The location of the configuration file that jest will use.`,
+          The location of the configuration file that jest will use.`
   },
   {
     short: 't',
@@ -44,8 +44,8 @@ const options: IOption[] = [
     type: 'string',
     describe: 'output format (ail, openapi, rst, md)',
     description: Dedent`
-          The output format.`,
-  },
+          The output format.`
+  }
 ]
 
 const builtinOptions: IOption[] = [
@@ -54,15 +54,15 @@ const builtinOptions: IOption[] = [
     name: 'version',
     type: 'boolean',
     describe: 'current version',
-    description: 'The current version of ts-doctest.',
+    description: 'The current version of ts-doctest.'
   },
   {
     short: 'h',
     name: 'help',
     type: 'boolean',
     describe: 'display detailed help',
-    description: 'Prints this help message.',
-  },
+    description: 'Prints this help message.'
+  }
 ]
 
 commander.version(VERSION, '-v, --version')
@@ -84,7 +84,7 @@ commander.on('--help', () => {
       o =>
         `${OptionUsageTag(o)}:${
           o.description.startsWith('\n') ? o.description.replace(/\n/g, indent) : indent + o.description
-        }`,
+        }`
     )
   console.log(`ts-doctest accepts the following commandline options:\n\n    ${optionDetails.join('\n\n    ')}\n\n`)
 })
@@ -92,7 +92,8 @@ commander.on('--help', () => {
 const parsed = commander.parseOptions(process.argv.slice(2))
 commander.args = parsed.args
 if (parsed.unknown.length !== 0) {
-  ;(commander.parseArgs as (args: string[], unknown: string[]) => void)([], parsed.unknown)
+  const parseArgs = commander.parseArgs as (args: string[], unknown: string[]) => void
+  parseArgs([], parsed.unknown)
 }
 const argv = (commander.opts() as any) as IArgv
 
@@ -106,9 +107,9 @@ run(
   {
     doctestConfig: argv.doctestConfig,
     jestConfig: argv.jestConfig,
-    format: argv.format,
+    format: argv.format
   },
-  logger,
+  logger
 )
   .then((rc: any) => {
     process.exitCode = rc
