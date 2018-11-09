@@ -1,12 +1,13 @@
 import commander = require('commander')
 
-import { Dedent } from './Utils/cliTools'
-import { run, ILogger } from './Utils/cliRunner'
+import { Dedent } from './Cli/cliTools'
+import { run, ILogger } from './Cli/cliRunner'
 
 const VERSION = '0.1.0'
 
 interface IArgv {
-  config?: string
+  doctestConfig?: string
+  jestConfig?: string
   help?: boolean
   format?: string
   version?: boolean
@@ -14,7 +15,6 @@ interface IArgv {
 
 interface IOption {
   short?: string
-  // Commander will camelCase option names.
   name: keyof IArgv
   type: 'string' | 'boolean' | 'array'
   describe: string // Short, used for usage message
@@ -23,12 +23,20 @@ interface IOption {
 
 const options: IOption[] = [
   {
-    short: 'c',
-    name: 'config',
+    short: 'dc',
+    name: 'doctestConfig',
     type: 'string',
-    describe: 'configuration file',
+    describe: 'doctest configuration file',
     description: Dedent`
           The location of the configuration file that doctest will use.`,
+  },
+  {
+    short: 'jc',
+    name: 'jestConfig',
+    type: 'string',
+    describe: 'jest configuration file',
+    description: Dedent`
+          The location of the configuration file that jest will use.`,
   },
   {
     short: 't',
@@ -96,7 +104,8 @@ const logger: ILogger = { log, error }
 
 run(
   {
-    config: argv.config,
+    doctestConfig: argv.doctestConfig,
+    jestConfig: argv.jestConfig,
     format: argv.format,
   },
   logger,

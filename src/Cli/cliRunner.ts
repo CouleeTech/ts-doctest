@@ -1,12 +1,17 @@
 import { spawn } from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
+
+import { GetFullPath, VerifyFileExists } from '../Common/Util/FileUtils'
 
 export interface IOptions {
   /**
-   * Path to a configuration file.
+   * Path to the doctest configuration file.
    */
-  config?: string
+  doctestConfig?: string
+
+  /**
+   * Path to the jest configuration file.
+   */
+  jestConfig?: string
 
   /**
    * Output format.
@@ -29,8 +34,6 @@ export class FatalError extends Error {
   constructor(public message: string, public innerError?: Error) {
     super(message)
     this.name = FatalError.NAME
-
-    // Fix prototype chain for target ES5
     Object.setPrototypeOf(this, FatalError.prototype)
   }
 }
@@ -48,29 +51,31 @@ export async function run(options: IOptions, logger: ILogger): Promise<Status> {
 }
 
 async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
-  if (!options.config) {
-    throw new FatalError(`ts-doctest requires a valid configration`)
+  const doctestConfigPath = options.doctestConfig ? GetFullPath(options.doctestConfig) : GetFullPath('doctest.json')
+  VerifyFileExists(
+    doctestConfigPath,
+    `Invalid path for the doctest configuration file. File not found: ${doctestConfigPath}`,
+  )
+
+  if (options.jestConfig) {
+    const jestConfigPath = GetFullPath(options.jestConfig)
+    VerifyFileExists(jestConfigPath, `Invalid path for the jest configuration file. File not found: ${jestConfigPath}`)
+    await runTests(logger, jestConfigPath)
+  } else {
+    await runTests(logger)
   }
-
-  const invokerPath = path.resolve('.')
-  const configPath = `${invokerPath}/${options.config}`
-
-  if (!fs.existsSync(configPath)) {
-    throw new FatalError(`Invalid option for configuration. File not found: ${configPath}`)
-  }
-
-  await runTests(configPath)
-  logger.log('Testing Complete. Generating Documentation.\n')
 
   return Status.Ok
 }
 
-async function runTests(configPath: string) {
-  const invokerPath = path.resolve('.')
-  const nodeModules = `${invokerPath}/node_modules`
+async function runTests(logger: ILogger, jestConfigPath?: string) {
+  const nodeModules = GetFullPath('node_modules')
   const jestPath = `${nodeModules}/jest/bin/jest.js`
+  VerifyFileExists(jestPath, `Jest is required to run ts-doctest. Jest was not found at the expected path: ${jestPath}`)
 
-  const runner = spawn(`${jestPath} --config=${configPath}`, {
+  const command = jestConfigPath ? `${jestPath} -c ${jestConfigPath}` : `${jestPath}`
+
+  const runner = spawn(command, {
     stdio: 'inherit',
     shell: true,
   } as any)
@@ -84,8 +89,9 @@ async function runTests(configPath: string) {
 
   runner.on('exit', code => {
     if (code !== 0) {
-      throw new Error()
+      throw new FatalError(`Testing Failed.`)
     } else {
+      logger.log('Testing Complete. Generating Documentation.\n')
       return { results, stdout: stdout.join('') }
     }
   })
