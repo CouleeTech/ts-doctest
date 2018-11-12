@@ -41,6 +41,8 @@
   "author": "Coulee Tech",
   "license": "MIT",
   "devDependencies": {
+    "@types/graceful-fs": "^4.1.2",
+    "@types/jsonfile": "^4.0.1",
     "@types/node": "^10.12.2",
     "@types/superagent": "^3.8.4",
     "@types/supertest": "^2.0.6",
@@ -51,6 +53,8 @@
   },
   "dependencies": {
     "commander": "^2.19.0",
+    "graceful-fs": "^4.1.15",
+    "jsonfile": "^5.0.0",
     "openapi3-ts": "^1.1.0",
     "superagent": "^4.0.0-beta.5",
     "supertest": "^3.3.0"
