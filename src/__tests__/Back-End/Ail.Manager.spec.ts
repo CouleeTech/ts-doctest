@@ -1,5 +1,6 @@
-import { AilManager, AilStorageEngineType } from '../../Back-End/Ail.Manager'
+import { AilManager } from '../../Back-End/Ail.Manager'
 import { RawDocContainer } from '../../Common'
+import { AilStorageEngineType } from '../../Config/Config'
 
 beforeAll(() => {
   AilManager.Init({ storageEngine: AilStorageEngineType.MEMORY })

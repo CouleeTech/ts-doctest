@@ -1,4 +1,4 @@
-import { PathsObject, PathItemObject } from 'openapi3-ts'
+import { PathItemObject } from 'openapi3-ts'
 
 import { AilFactory } from '../../Back-End/Ail.Factory'
 import { RawDocData } from '../../Common'
@@ -20,8 +20,8 @@ describe('AIL Factory', () => {
   it('RawPathToAil should return a valid PathsObject', () => {
     const rawApiData = validRawApiResponse()
     for (const path of rawApiData) {
-      const pathObject: PathsObject = MockAilFactory.rawToAil(path[0] as string, path[1] as any)
-      validatePathsObject(path[0] as string, pathObject)
+      const pathObject: [string, PathItemObject] = MockAilFactory.rawToAil(path[0] as string, path[1] as any)
+      validatePathsObject(pathObject)
     }
   })
 
@@ -45,14 +45,10 @@ describe('AIL Factory', () => {
   })
 })
 
-function validatePathsObject(path: string, pathObject: PathsObject) {
-  // There should only ever be one key per path object
-  expect(Object.keys(pathObject).length).toBe(1)
-  // The one key should be the name of the path
-  expect(pathObject).toHaveProperty(path)
-  validatePathsItemObject(pathObject[path])
-  console.log(path)
-  console.log(JSON.stringify(pathObject))
+function validatePathsObject(pathObject: [string, PathItemObject]) {
+  const [pathName, pathObjectItem] = pathObject
+  expect(pathName).toBeTruthy()
+  validatePathsItemObject(pathObjectItem)
 }
 
 function validatePathsItemObject(item: PathItemObject) {
