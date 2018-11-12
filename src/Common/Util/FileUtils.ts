@@ -35,16 +35,23 @@ export function GetFullPath(filePath: string) {
   return `${BASE_PATH}/${pathString}`
 }
 
+/* ~~~ JSON Functions ~~~ */
+
 export async function GetJsonFile(filePath: string) {
-  VerifyFileExists(filePath)
-  const json = await jsonfile.readFile(filePath)
-  return json
+  return await jsonfile.readFile(filePath)
 }
 
 export function GetJsonFileSync(filePath: string) {
   VerifyFileExists(filePath)
-  const json = jsonfile.readFileSync(filePath)
-  return json
+  return jsonfile.readFileSync(filePath)
+}
+
+export async function WriteJsonFile(filePath: string, data: any) {
+  return await jsonfile.writeFile(filePath, data)
+}
+
+export function WriteJsonFileSync(filePath: string, data: any) {
+  return jsonfile.writeFileSync(filePath, data)
 }
 
 /**
