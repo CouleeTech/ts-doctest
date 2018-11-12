@@ -1,6 +1,6 @@
 import { spawn } from 'child_process'
 
-import { GetFullPath, VerifyFileExists } from '../Common/Util/FileUtils'
+import { GetFullPath, VerifyFileExistsSync } from '../Common/Util/FileUtils'
 
 export interface IOptions {
   /**
@@ -52,14 +52,17 @@ export async function run(options: IOptions, logger: ILogger): Promise<Status> {
 
 async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
   const doctestConfigPath = options.doctestConfig ? GetFullPath(options.doctestConfig) : GetFullPath('doctest.json')
-  VerifyFileExists(
+  VerifyFileExistsSync(
     doctestConfigPath,
     `Invalid path for the doctest configuration file. File not found: ${doctestConfigPath}`
   )
 
   if (options.jestConfig) {
     const jestConfigPath = GetFullPath(options.jestConfig)
-    VerifyFileExists(jestConfigPath, `Invalid path for the jest configuration file. File not found: ${jestConfigPath}`)
+    VerifyFileExistsSync(
+      jestConfigPath,
+      `Invalid path for the jest configuration file. File not found: ${jestConfigPath}`
+    )
     await runTests(logger, jestConfigPath)
   } else {
     await runTests(logger)
@@ -71,7 +74,10 @@ async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
 async function runTests(logger: ILogger, jestConfigPath?: string) {
   const nodeModules = GetFullPath('node_modules')
   const jestPath = `${nodeModules}/jest/bin/jest.js`
-  VerifyFileExists(jestPath, `Jest is required to run ts-doctest. Jest was not found at the expected path: ${jestPath}`)
+  VerifyFileExistsSync(
+    jestPath,
+    `Jest is required to run ts-doctest. Jest was not found at the expected path: ${jestPath}`
+  )
 
   const command = jestConfigPath ? `${jestPath} -c ${jestConfigPath}` : `${jestPath}`
 

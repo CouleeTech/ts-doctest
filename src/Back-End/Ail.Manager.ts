@@ -1,12 +1,9 @@
-import * as fs from 'fs'
-
 import { IsObject, IsString } from '../Common'
 import { RawDocContainer } from '../Common/RawDocs.Container'
-
+import { GetJsonFileSync, GetFullPath, WriteJsonFile, VerifyDirectoryExistsSync } from '../Common/Util/FileUtils'
 import { AilStorageEngineType, DEFAULT_CONFIG_PATH } from '../Config/Config'
 import { AilFactory } from './Ail.Factory'
 import { IAilJson } from './Interfaces/Ail.Factory.Interfaces'
-import { GetJsonFileSync, GetFullPath } from '../Common/Util/FileUtils'
 
 /**
  * A configuration object used to initialize the AilManager
@@ -86,46 +83,10 @@ export class AilManager {
   }
 
   /**
-   * Creates a file that is used to save the API results of one controller
-   *
-   * @param controller The name of the controller the results belong to
-   */
-  private static CreateApiResultFile(controller: string) {
-    fs.closeSync(fs.openSync(`${this.GetResultFilePath(controller)}`, 'w'))
-  }
-
-  /**
-   * Creates a directory for the API results
-   */
-  private static CreateApiResultsDirectory() {
-    console.log('Creating the API Test results directory')
-    fs.mkdirSync(this.CONFIG.resultsDirectory as string)
-  }
-
-  /**
    * Ensures that the API results directory exists. If not, it creates the directory.
    */
   private static EnsureApiResultsDirectory() {
-    fs.stat(this.CONFIG.resultsDirectory as string, (err, stats) => {
-      if (err) {
-        if (DoesNotExist(err)) {
-          console.log('API Test results directory does not exist!')
-          this.CreateApiResultsDirectory()
-        } else {
-          throw new Error('Unexpected error encountered while searching for the results directory')
-        }
-      } else {
-        if (stats) {
-          if (!stats.isDirectory()) {
-            console.log('API Test results is not a directory. Deleting file.')
-            fs.unlinkSync(this.CONFIG.resultsDirectory as string)
-            this.CreateApiResultsDirectory()
-          }
-        } else {
-          throw new Error('Unexpected Error: No Stats')
-        }
-      }
-    })
+    VerifyDirectoryExistsSync(this.CONFIG.resultsDirectory as string)
   }
 
   /**
@@ -191,22 +152,12 @@ export class AilManager {
     const { storageEngine } = this.CONFIG as IAilManagerConfig
 
     if (storageEngine === AilStorageEngineType.FILE) {
-      this.CreateApiResultFile(controller)
-      return await Promise.resolve(
-        fs.writeFile(`${this.GetResultFilePath(controller)}`, `${JSON.stringify(ailJson)}\n`, err => {
-          const resultFile = this.GetResultFilePath(controller)
-          if (err) {
-            throw new Error(`Failed the write the following Api result file: ${resultFile}`)
-          }
-          console.log(`Wrote the ${controller} controller's API results to the following file: ${resultFile}`)
-        })
-      )
+      const filePath = this.GetResultFilePath(controller)
+      try {
+        await WriteJsonFile(filePath, ailJson)
+      } catch (e) {
+        throw new Error(`Failed the write the following intermediate file: ${filePath}`)
+      }
     }
   }
-}
-
-// Helper Functions
-
-function DoesNotExist(err: NodeJS.ErrnoException) {
-  return err.code === 'ENOENT'
 }

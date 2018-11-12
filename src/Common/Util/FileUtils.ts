@@ -42,7 +42,7 @@ export async function GetJsonFile(filePath: string) {
 }
 
 export function GetJsonFileSync(filePath: string) {
-  VerifyFileExists(filePath)
+  VerifyFileExistsSync(filePath)
   return jsonfile.readFileSync(filePath)
 }
 
@@ -57,13 +57,37 @@ export function WriteJsonFileSync(filePath: string, data: any) {
 /**
  * Verify whether or not a file exists
  *
- * @param path The filesystem path to a file
+ * @param filePath The filesystem path to a file
  * @param notFoundMessage Optional message to include in Exception if file is not found
  */
-export function VerifyFileExists(filePath: string, notFoundMessage?: string): boolean {
+export function VerifyFileExistsSync(filePath: string, notFoundMessage?: string): boolean {
   if (!fs.existsSync(filePath)) {
-    const exceptionMessage = notFoundMessage ? notFoundMessage : `A following file could not be found: ${path}`
+    const exceptionMessage = notFoundMessage ? notFoundMessage : `A following file could not be found: ${filePath}`
     throw new FileException(exceptionMessage)
   }
   return true
+}
+
+/**
+ * Verify whether or not a directory exists
+ *
+ * If the directory does not exist or is not a directory, a new directory will be created. If
+ * necessary, any files with the same name as the directory will be deleted.
+ *
+ * @param directoryPath The filesystem path to a directory
+ */
+export function VerifyDirectoryExistsSync(directoryPath: string) {
+  const exists = fs.existsSync(directoryPath)
+
+  if (!exists) {
+    fs.mkdirSync(directoryPath)
+    return
+  }
+
+  const isADirectory = fs.lstatSync(directoryPath).isDirectory()
+
+  if (!isADirectory) {
+    fs.unlinkSync(directoryPath)
+    fs.mkdirSync(directoryPath)
+  }
 }
