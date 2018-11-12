@@ -1,6 +1,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { IsString } from '../Validation/TypeChecks'
+
 export class FileException extends Error {
   public constructor(message: string) {
     super(message)
@@ -15,6 +17,10 @@ const BASE_PATH = path.resolve('.')
  * @param filePath The relative path to a file
  */
 export function GetFullPath(filePath: string) {
+  if (!IsString(filePath)) {
+    throw new FileException('Please provide a valid file path.')
+  }
+
   let pathString = filePath.slice(0)
   const firstChar = pathString.charAt(0)
   const secondChar = pathString.charAt(1)
