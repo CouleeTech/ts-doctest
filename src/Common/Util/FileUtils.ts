@@ -1,4 +1,5 @@
 import * as fs from 'graceful-fs'
+import * as jsonfile from 'jsonfile'
 import * as path from 'path'
 
 import { IsString } from '../Validation/TypeChecks'
@@ -36,13 +37,13 @@ export function GetFullPath(filePath: string) {
 
 export async function GetJsonFile(filePath: string) {
   VerifyFileExists(filePath)
-  const json = require(filePath)
+  const json = await jsonfile.readFile(filePath)
   return json
 }
 
 export function GetJsonFileSync(filePath: string) {
   VerifyFileExists(filePath)
-  const json = require(filePath)
+  const json = jsonfile.readFileSync(filePath)
   return json
 }
 
