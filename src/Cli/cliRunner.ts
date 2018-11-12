@@ -1,6 +1,9 @@
 import { spawn } from 'child_process'
 
-import { GetFullPath, VerifyFileExistsSync } from '../Common/Util/FileUtils'
+import { AilGatherer } from '../Back-End/Ail.Gatherer'
+import { IAilCollection } from '../Back-End/Interfaces/Ail.Interfaces'
+import { GetFullPath, VerifyFileExistsSync, GetJsonFile } from '../Common/Util/FileUtils'
+import { IDoctestConfig } from '../Config/Config'
 
 export interface IOptions {
   /**
@@ -12,6 +15,11 @@ export interface IOptions {
    * Path to the jest configuration file.
    */
   jestConfig?: string
+
+  /**
+   * Run jest without using its caching.
+   */
+  noCache?: boolean
 
   /**
    * Output format.
@@ -57,21 +65,24 @@ async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
     `Invalid path for the doctest configuration file. File not found: ${doctestConfigPath}`
   )
 
+  const doctestConfig: IDoctestConfig = await GetJsonFile<IDoctestConfig>(doctestConfigPath)
+  const noCache = options.noCache ? options.noCache : false
+
   if (options.jestConfig) {
     const jestConfigPath = GetFullPath(options.jestConfig)
     VerifyFileExistsSync(
       jestConfigPath,
       `Invalid path for the jest configuration file. File not found: ${jestConfigPath}`
     )
-    await runTests(logger, jestConfigPath)
+    await runTests(logger, doctestConfig, noCache, jestConfigPath)
   } else {
-    await runTests(logger)
+    await runTests(logger, doctestConfig, noCache)
   }
 
   return Status.Ok
 }
 
-async function runTests(logger: ILogger, jestConfigPath?: string) {
+async function runTests(logger: ILogger, doctestConfig: IDoctestConfig, noCache: boolean, jestConfigPath?: string) {
   const nodeModules = GetFullPath('node_modules')
   const jestPath = `${nodeModules}/jest/bin/jest.js`
   VerifyFileExistsSync(
@@ -79,7 +90,9 @@ async function runTests(logger: ILogger, jestConfigPath?: string) {
     `Jest is required to run ts-doctest. Jest was not found at the expected path: ${jestPath}`
   )
 
-  const command = jestConfigPath ? `${jestPath} -c ${jestConfigPath}` : `${jestPath}`
+  const command = jestConfigPath
+    ? `${jestPath} -c ${jestConfigPath}${noCache ? ' --no-cache' : ''}`
+    : `${jestPath}${noCache ? ' --no-cache' : ''}`
 
   const runner = spawn(command, {
     stdio: 'inherit',
@@ -93,11 +106,13 @@ async function runTests(logger: ILogger, jestConfigPath?: string) {
     results = data
   })
 
-  runner.on('exit', code => {
+  runner.on('exit', async code => {
     if (code !== 0) {
       throw new FatalError(`Testing Failed.`)
     } else {
       logger.log('Testing Complete. Generating Documentation.\n')
+      const collection: IAilCollection = await AilGatherer.Gather(doctestConfig)
+      console.log(collection)
       return { results, stdout: stdout.join('') }
     }
   })

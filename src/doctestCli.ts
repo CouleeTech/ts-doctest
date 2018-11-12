@@ -8,6 +8,7 @@ const VERSION = '0.1.0'
 interface IArgv {
   doctestConfig?: string
   jestConfig?: string
+  noCache?: boolean
   help?: boolean
   format?: string
   version?: boolean
@@ -37,6 +38,14 @@ const options: IOption[] = [
     describe: 'jest configuration file',
     description: Dedent`
           The location of the configuration file that jest will use.`
+  },
+  {
+    short: 'nc',
+    name: 'noCache',
+    type: 'boolean',
+    describe: 'no caching during tests',
+    description: Dedent`
+          Run jest without using its caching.`
   },
   {
     short: 't',
