@@ -1,6 +1,5 @@
 import {
   OperationObject,
-  PathsObject,
   PathItemObject,
   ResponseObject,
   RequestBodyObject,
@@ -9,15 +8,16 @@ import {
   ParameterLocation
 } from 'openapi3-ts'
 
+import { HttpMethodWithRequestBody } from '../Common/Http'
 import { ContainerPaths } from '../Common/RawDocs.Container'
 import { RawDocData, IRawHeader } from '../Common/RawDocs.Interface'
-import { IAilJson, IOperationObjectCollection, NO_DESCRIPTION_PROVIDED } from './Interfaces/Ail.Factory.Interfaces'
-import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
-import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
-import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
-import { HttpMethodWithRequestBody } from '../Common/Http'
 import { SimpleParameterString } from '../Common/Util/ParameterString.Builder'
 import { BuildQueryString, IsQueryPairArray, QueryStringConfig } from '../Common/Util/QueryString.Builder'
+import { MissingRequiredField, HasItems } from '../Common/Validation/HelperFunctions'
+import { IsArray, IsObject } from '../Common/Validation/TypeChecks'
+import { DEFAULT_AIL_VERSION, DEFAULT_OPEN_API_VERSION } from '../Config/Config'
+import { AilFactoryException } from './Exceptions/Ail.Factory.Exception'
+import { IAilJson, IOperationObjectCollection, NO_DESCRIPTION_PROVIDED } from './Interfaces/Ail.Interfaces'
 
 // The headers should be filtered out if included with raw API data
 const FILTERED_HEADERS = ['x-powered-by', 'etag', 'connection', 'user-agent']
@@ -28,8 +28,8 @@ const FILTERED_HEADERS = ['x-powered-by', 'etag', 'connection', 'user-agent']
  * AIL JSON is an extended subset of OpenAPI 3.0.0
  */
 export class AilFactory {
-  private static readonly AIL_VERSION = '0.1.0'
-  private static readonly OPEN_API_VERSION = '3.0.0'
+  private static readonly AIL_VERSION = DEFAULT_AIL_VERSION
+  private static readonly OPEN_API_VERSION = DEFAULT_OPEN_API_VERSION
 
   /**
    * This class should never be instantiated
@@ -48,10 +48,18 @@ export class AilFactory {
       dateCreated: Date.now(),
       openApiVersion: this.OPEN_API_VERSION,
       controller,
-      paths: rawPaths.map(([path, rawData]) => {
+      paths: {}
+    }
+
+    const paths = rawPaths
+      .map(([path, rawData]) => {
         this.ValidateRawData(path, rawData)
         return this.RawPathToAil(path, rawData)
       })
+      .sort(([path1, _], [path2, __]) => path1.localeCompare(path2))
+
+    for (const [path, item] of paths) {
+      ailJson.paths[path] = item
     }
 
     return ailJson
@@ -63,14 +71,12 @@ export class AilFactory {
    * @param path The name of the path
    * @param rawData Raw data associated with the path and its operations
    */
-  protected static RawPathToAil(path: string, rawData: RawDocData[]): PathsObject {
+  protected static RawPathToAil(path: string, rawData: RawDocData[]): [string, PathItemObject] {
     const pathAilItem: PathItemObject = {
       ...this.RawOperationsToAil(rawData)
     }
 
-    const pathAil: PathsObject = {
-      [path]: pathAilItem
-    }
+    const pathAil: [string, PathItemObject] = [path, pathAilItem]
 
     return pathAil
   }

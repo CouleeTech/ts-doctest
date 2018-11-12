@@ -3,9 +3,29 @@ import { IHttpRequestHeader, HttpRequestMethod } from '../../Common/Http'
 
 export const pathOperations = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
 
-/* Constant Strings */
+/* ~~~ Constant Strings ~~~ */
 
 export const NO_DESCRIPTION_PROVIDED = 'No description provided'
+
+export interface IAilJson {
+  ailVersion: string
+  dateCreated: number
+  openApiVersion: string
+  controller: string
+  paths: { [pathName: string]: PathsObject }
+}
+
+export interface IAilCollectionItem {
+  dateCreated: number
+  paths: { [pathName: string]: PathsObject }
+}
+
+export interface IAilCollection {
+  ailVersion: string
+  dateCreated: number
+  openApiVersion: string
+  items: { [controller: string]: IAilCollectionItem }
+}
 
 export interface IOperationObjectCollection {
   [path: string]: OperationObject[]
@@ -13,14 +33,6 @@ export interface IOperationObjectCollection {
 
 export interface IOperationResponses {
   [response: string]: ResponseObject
-}
-
-export interface IAilJson {
-  ailVersion: string
-  dateCreated: number
-  openApiVersion: string
-  controller: string
-  paths: PathsObject[]
 }
 
 export interface IAilRequest {

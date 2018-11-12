@@ -3,7 +3,7 @@ import { RawDocContainer } from '../Common/RawDocs.Container'
 import { GetJsonFileSync, GetFullPath, WriteJsonFile, VerifyDirectoryExistsSync } from '../Common/Util/FileUtils'
 import { AilStorageEngineType, DEFAULT_CONFIG_PATH } from '../Config/Config'
 import { AilFactory } from './Ail.Factory'
-import { IAilJson } from './Interfaces/Ail.Factory.Interfaces'
+import { IAilJson } from './Interfaces/Ail.Interfaces'
 
 /**
  * A configuration object used to initialize the AilManager
@@ -14,13 +14,13 @@ export interface IAilManagerConfig {
 }
 
 /**
- * The primary interface to the back-end used to convert raw API doc data into AIL files
+ * Used to convert raw API doc data into AIL files
  *
  * Raw API documentation data is stored in formatted JSON files. These files are used
  * to generate intermediate files that can be converted to documentation.
  */
 export class AilManager {
-  private static ALLOWED_ENGINE_TYPES = ['FILE', 'MEMORY']
+  private static ALLOWED_ENGINE_TYPES = [AilStorageEngineType.FILE, AilStorageEngineType.MEMORY]
   private static CONFIG: IAilManagerConfig
   private static INITIALIZED = false
   private static MEMORY_RESULTS: Map<string, IAilJson>

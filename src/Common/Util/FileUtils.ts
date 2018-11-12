@@ -13,6 +13,23 @@ export class FileException extends Error {
 const BASE_PATH = path.resolve('.')
 
 /**
+ * List all of the contents of a directory
+ *
+ * @param directoryPath The path to the directory
+ */
+export function GetDirectoryContents(directoryPath: string): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    fs.readdir(directoryPath, (err, files) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(files)
+      }
+    })
+  })
+}
+
+/**
  * Convery a relative path to a full system path
  *
  * @param filePath The relative path to a file
@@ -37,8 +54,8 @@ export function GetFullPath(filePath: string) {
 
 /* ~~~ JSON Functions ~~~ */
 
-export async function GetJsonFile(filePath: string) {
-  return await jsonfile.readFile(filePath)
+export async function GetJsonFile<T>(filePath: string): Promise<T> {
+  return (await jsonfile.readFile(filePath)) as any
 }
 
 export function GetJsonFileSync(filePath: string) {
