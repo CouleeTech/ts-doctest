@@ -79,7 +79,7 @@ export class AilGatherer {
    * @param resultsDirectory The directory that contains all of the AIL files
    */
   private static async GatherFromFilesystem(resultsDirectory: string): Promise<IAilJson[]> {
-    const resultsFileList = await GetDirectoryContents(resultsDirectory)
+    const resultsFileList = (await GetDirectoryContents(resultsDirectory)).filter(file => file.endsWith('.ail.json'))
 
     if (!resultsFileList || resultsFileList.length < 1) {
       throw new AilGathererException('No AIL results were found')

@@ -1,6 +1,8 @@
 import { spawn } from 'child_process'
 
 import { AilGatherer } from '../Back-End/Ail.Gatherer'
+import { IAilCollection } from '../Back-End/Interfaces/Ail.Interfaces'
+import { OutputGenerator } from '../Back-End/Output.Generator'
 import { GetFullPath, VerifyFileExistsSync, GetJsonFile } from '../Common/Util/FileUtils'
 import { IDoctestConfig } from '../Config/Config'
 
@@ -111,8 +113,8 @@ async function runTests(logger: ILogger, doctestConfig: IDoctestConfig, noCache:
     } else {
       logger.log('Testing Complete. Generating Documentation.\n')
 
-      /* const collection: IAilCollection = */
-      await AilGatherer.Gather(doctestConfig)
+      const collection: IAilCollection = await AilGatherer.Gather(doctestConfig)
+      await OutputGenerator.GenerateOutput(doctestConfig, collection)
       return { results, stdout: stdout.join('') }
     }
   })

@@ -100,11 +100,9 @@ export class AilFactory {
 
       // At least one response is required
       const operationType: OperationObject = {
-        responses: [
-          {
-            [value.results.res.status]: this.ResponseObjectFromRawData(value)
-          }
-        ]
+        responses: {
+          [value.results.res.status]: this.ResponseObjectFromRawData(value)
+        }
       }
 
       if (HttpMethodWithRequestBody(type)) {
