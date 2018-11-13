@@ -11,6 +11,14 @@ export enum AilStorageEngineType {
 }
 
 /**
+ * Various formats that an AIL JSON collection may be converted to
+ */
+export enum OutputFormat {
+  SWAGGER = 'swagger',
+  SPHINX = 'sphnix'
+}
+
+/**
  * The data structure for the doctest configuration
  */
 export interface IDoctestConfig {
@@ -18,4 +26,5 @@ export interface IDoctestConfig {
   resultsDirectory: string
   ailVersion?: string
   openApiVersion?: string
+  outputFormats: OutputFormat[]
 }
