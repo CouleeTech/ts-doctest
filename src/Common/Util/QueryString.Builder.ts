@@ -1,7 +1,12 @@
 import { FormParameterString, DeepObjectParameterString } from './ParameterString.Builder'
 import { IsNumber, IsNullOrUndefined, IsString, IsObject, IsArray, IsFalsy } from '../Validation'
 
-export type QuerySimpleValue = string | number | null | undefined
+export type SimpleValue = string | number | null | undefined
+export interface ISimpleObject {
+  [key: string]: SimpleValue
+}
+
+export type QuerySimpleValue = SimpleValue | ISimpleObject
 
 export type QueryArrayValue = QuerySimpleValue[]
 
