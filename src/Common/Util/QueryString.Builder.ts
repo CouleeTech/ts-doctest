@@ -6,7 +6,11 @@ export interface ISimpleObject {
   [key: string]: SimpleValue
 }
 
-export type QuerySimpleValue = SimpleValue | ISimpleObject
+export type SimpleType = SimpleValue | ISimpleObject
+
+export type SimpleArray = SimpleType[]
+
+export type QuerySimpleValue = SimpleType | SimpleArray
 
 export type QueryArrayValue = QuerySimpleValue[]
 
