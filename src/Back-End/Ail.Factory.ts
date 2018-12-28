@@ -6,7 +6,6 @@ import {
   MediaTypeObject,
   ParameterObject,
   ParameterLocation,
-  ContentObject,
   SchemaObject
 } from 'openapi3-ts'
 
