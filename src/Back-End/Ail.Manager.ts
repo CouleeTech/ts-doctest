@@ -40,9 +40,9 @@ export class AilManager {
       throw new Error('Tried to consume a container with an uninitialized AilManager')
     }
 
-    const { controller, paths }: IContainerContents = container.consume()
+    const { controller, paths, ...options }: IContainerContents = container.consume()
 
-    const ailJson: IAilJson = AilFactory.Create(controller, paths)
+    const ailJson: IAilJson = AilFactory.Create(controller, paths, options)
     await this.StoreAilResults(controller, ailJson)
   }
 

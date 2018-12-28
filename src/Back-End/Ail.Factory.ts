@@ -10,7 +10,7 @@ import {
 } from 'openapi3-ts'
 
 import { HttpMethodWithRequestBody } from '../Common/Http'
-import { ContainerPaths } from '../Common/RawDocs.Container'
+import { ContainerPaths, IOptionalContainerContents } from '../Common/RawDocs.Container'
 import { RawDocData, IRawHeader } from '../Common/RawDocs.Interface'
 import { SimpleParameterString } from '../Common/Util/ParameterString.Builder'
 import { BuildQueryString, IsQueryPairArray, QueryStringConfig } from '../Common/Util/QueryString.Builder'
@@ -42,8 +42,9 @@ export class AilFactory {
    *
    * @param controller The name of the controller the results belong to
    * @param rawPaths Raw API documentation data for a controller's paths
+   * @param options Values that may impact the AIL output such as tags for the operations
    */
-  public static Create(controller: string, rawPaths: ContainerPaths): IAilJson {
+  public static Create(controller: string, rawPaths: ContainerPaths, options: IOptionalContainerContents): IAilJson {
     const ailJson: IAilJson = {
       ailVersion: this.AIL_VERSION,
       dateCreated: Date.now(),
@@ -55,7 +56,7 @@ export class AilFactory {
     const paths = rawPaths
       .map(([path, rawData]) => {
         this.ValidateRawData(path, rawData)
-        return this.RawPathToAil(path, rawData)
+        return this.RawPathToAil(path, rawData, options)
       })
       .sort(([path1, _], [path2, __]) => path1.localeCompare(path2))
 
@@ -71,10 +72,15 @@ export class AilFactory {
    *
    * @param path The name of the path
    * @param rawData Raw data associated with the path and its operations
+   * @param options Values that may impact the AIL output such as tags for the operations
    */
-  protected static RawPathToAil(path: string, rawData: RawDocData[]): [string, PathItemObject] {
+  protected static RawPathToAil(
+    path: string,
+    rawData: RawDocData[],
+    options: IOptionalContainerContents
+  ): [string, PathItemObject] {
     const pathAilItem: PathItemObject = {
-      ...this.RawOperationsToAil(rawData)
+      ...this.RawOperationsToAil(rawData, options)
     }
 
     const pathAil: [string, PathItemObject] = [path, pathAilItem]
@@ -86,8 +92,12 @@ export class AilFactory {
    * Convert the raw path operations into an object with keys containing OperationObjects
    *
    * @param rawData Raw data associated with the path and its operations
+   * @param options Values that may impact the AIL output such as tags for the operations
    */
-  protected static RawOperationsToAil(rawData: RawDocData[]): IOperationObjectCollection {
+  protected static RawOperationsToAil(
+    rawData: RawDocData[],
+    options: IOptionalContainerContents
+  ): IOperationObjectCollection {
     const operations: IOperationObjectCollection = {}
 
     for (const value of rawData) {
@@ -103,6 +113,12 @@ export class AilFactory {
       const operationType: OperationObject = {
         responses: {
           [value.results.res.status]: this.ResponseObjectFromRawData(value)
+        }
+      }
+
+      if (options) {
+        if (options.tags) {
+          operationType.tags = options.tags
         }
       }
 

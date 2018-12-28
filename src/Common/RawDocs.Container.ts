@@ -1,5 +1,6 @@
 import { ITestSuiteInfo } from '../Front-End/ControllerTestSuite'
 import { RawDocData } from './RawDocs.Interface'
+import { Omit } from './Types'
 
 export type Title = string
 
@@ -11,6 +12,10 @@ export interface IContainerContents {
   paths: ContainerPaths
   tags?: string[]
 }
+
+export type RequiredContainerContents = 'controller' | 'paths'
+
+export interface IOptionalContainerContents extends Omit<IContainerContents, RequiredContainerContents> {}
 
 /**
  * Used to hold a controller's raw API documentation data
