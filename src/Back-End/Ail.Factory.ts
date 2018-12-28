@@ -244,7 +244,13 @@ export class AilFactory {
    * @param example The example content
    */
   protected static JsonContent(example: any): MediaTypeObject {
-    return { 'application/json': { example: { ...example } } }
+    if (IsObject(example)) {
+      return { 'application/json': { example: { ...example } } }
+    } else if (IsArray(example)) {
+      return { 'application/json': { example: [...example] } }
+    }
+
+    return { 'application/json': example }
   }
 
   /**
