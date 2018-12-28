@@ -9,6 +9,7 @@ export interface IContainerContents {
   controller: string
   description: string
   paths: ContainerPaths
+  tags?: string[]
 }
 
 /**
@@ -17,6 +18,7 @@ export interface IContainerContents {
 export class RawDocContainer {
   private readonly controller: string
   private readonly description?: string
+  private readonly tags?: string[]
   private data: Map<string, Set<RawDocData>>
   private consumed: boolean
 
@@ -26,9 +28,15 @@ export class RawDocContainer {
   public constructor(info: ITestSuiteInfo) {
     this.consumed = false
     this.controller = info.controller
+
     if (info.description) {
       this.description = info.description
     }
+
+    if (info.tags) {
+      this.tags = info.tags
+    }
+
     this.data = new Map<string, Set<RawDocData>>()
   }
 
@@ -64,10 +72,17 @@ export class RawDocContainer {
     }
 
     this.consumed = true
-    return {
+
+    const contents: IContainerContents = {
       controller: this.controller,
       description: this.description || '',
       paths: Array.from(this.data, ([path, data]) => [path, [...data.values()]]) as ContainerPaths
     }
+
+    if (this.tags) {
+      contents.tags = this.tags
+    }
+
+    return contents
   }
 }

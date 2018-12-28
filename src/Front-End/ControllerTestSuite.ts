@@ -4,10 +4,10 @@ import * as supertest from 'supertest'
 import { HttpRequestMethod, HttpRequestMethods } from '../Common/Http'
 import { RawDocContainer } from '../Common/RawDocs.Container'
 import { RawDocData, IRequestParameters } from '../Common/RawDocs.Interface'
-import { IsFunction } from '../Common/Validation/TypeChecks'
+import { IsFunction, IsString } from '../Common/Validation/TypeChecks'
 
-import { QueryStringConfig, BuildQueryString } from '../Common/Util/QueryString.Builder'
 import { AilManager } from '../Back-End/Ail.Manager'
+import { QueryStringConfig, BuildQueryString } from '../Common/Util/QueryString.Builder'
 import { IApplication } from './Application.Interface'
 import { RequestWrapper } from './Request.Wrapper'
 import { TestSuiteException } from './TestSuite.Exception'
@@ -15,7 +15,9 @@ import { TestSuiteException } from './TestSuite.Exception'
 export interface ITestSuiteInfo {
   controller: string
   description?: string
+  tags?: string[]
 }
+
 export interface ITestSuiteConfig {
   appBuilder: () => Promise<IApplication>
   info: ITestSuiteInfo
@@ -39,7 +41,7 @@ export interface IOperationConfig {
 }
 
 /**
- * The primary interface for the creating end-to-end test suites used for testing and documenting API endpoints
+ * The primary interface for the creating api test suites used for testing and documenting API endpoints
  *
  * Each test suite should represent one and only one controller. Also, in regards to documentation, there should
  * only ever be one test suite per controller. Use this class by extending it and implementing its abstract methods.
@@ -184,7 +186,7 @@ export abstract class ControllerTestSuite {
    * @param config The configuration object for a TestSuitePath
    */
   public path(config: IPathConfig | string): TestSuitePath {
-    if (typeof config === 'string') {
+    if (IsString(config)) {
       config = { name: config }
     }
 
@@ -363,7 +365,7 @@ export class TestSuitePath {
     second: IOperationTemplates | ResponseGenerator,
     third?: ResponseGenerator
   ) {
-    if (typeof config === 'string') {
+    if (IsString(config)) {
       config = { name: config }
     }
 

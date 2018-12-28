@@ -1,5 +1,5 @@
 import { IsObject, IsString } from '../Common'
-import { RawDocContainer } from '../Common/RawDocs.Container'
+import { RawDocContainer, IContainerContents } from '../Common/RawDocs.Container'
 import { GetJsonFileSync, GetFullPath, WriteJsonFile, VerifyDirectoryExistsSync } from '../Common/Util/FileUtils'
 import { AilStorageEngineType, DEFAULT_CONFIG_PATH } from '../Config/Config'
 import { AilFactory } from './Ail.Factory'
@@ -40,7 +40,7 @@ export class AilManager {
       throw new Error('Tried to consume a container with an uninitialized AilManager')
     }
 
-    const { controller, paths } = container.consume()
+    const { controller, paths }: IContainerContents = container.consume()
 
     const ailJson: IAilJson = AilFactory.Create(controller, paths)
     await this.StoreAilResults(controller, ailJson)
