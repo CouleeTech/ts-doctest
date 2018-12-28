@@ -5,7 +5,8 @@ import {
   RequestBodyObject,
   MediaTypeObject,
   ParameterObject,
-  ParameterLocation
+  ParameterLocation,
+  ContentObject
 } from 'openapi3-ts'
 
 import { HttpMethodWithRequestBody } from '../Common/Http'
@@ -145,10 +146,16 @@ export class AilFactory {
       const queryParams = rawData.parameters!.queryParameters as QueryStringConfig
       if (IsQueryPairArray(queryParams)) {
         for (const queryParam of queryParams) {
-          parameters.push({ name: queryParam.key, in: 'query', example: BuildQueryString(queryParam) })
+          const content: ContentObject = {
+            'text/plain': { example: { value: BuildQueryString(queryParam) } }
+          }
+          parameters.push({ name: queryParam.key, in: 'query', content })
         }
       } else {
-        parameters.push({ name: queryParams.key, in: 'query', example: BuildQueryString(queryParams) })
+        const content: ContentObject = {
+          'text/plain': { example: { value: BuildQueryString(queryParams) } }
+        }
+        parameters.push({ name: queryParams.key, in: 'query', content })
       }
     }
 
@@ -228,10 +235,14 @@ export class AilFactory {
           }
         }
 
+        const content: ContentObject = {
+          'text/plain': { example: { value: SimpleParameterString(headers[header]) } }
+        }
+
         return {
           name: header,
           in: 'header' as ParameterLocation,
-          example: SimpleParameterString(headers[header])
+          content
         }
       })
 
