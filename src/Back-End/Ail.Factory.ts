@@ -6,7 +6,8 @@ import {
   MediaTypeObject,
   ParameterObject,
   ParameterLocation,
-  ContentObject
+  ContentObject,
+  SchemaObject
 } from 'openapi3-ts'
 
 import { HttpMethodWithRequestBody } from '../Common/Http'
@@ -128,6 +129,8 @@ export class AilFactory {
   protected static ParametersFromRawData(rawData: RawDocData): ParameterObject[] {
     const parameters: ParameterObject[] = []
 
+    const schema: SchemaObject = { type: 'string' }
+
     const requestHeaders = rawData.requestHeaders
       ? this.ParseRawHeaders(rawData.results.req.headers, rawData.requestHeaders)
       : this.ParseRawHeaders(rawData.results.req.headers)
@@ -138,7 +141,7 @@ export class AilFactory {
 
     if (rawData.parameters!.pathParameters) {
       for (const pathParam of rawData.parameters!.pathParameters) {
-        parameters.push({ name: pathParam, in: 'path', required: true })
+        parameters.push({ name: pathParam, in: 'path', schema, required: true })
       }
     }
 
@@ -146,16 +149,12 @@ export class AilFactory {
       const queryParams = rawData.parameters!.queryParameters as QueryStringConfig
       if (IsQueryPairArray(queryParams)) {
         for (const queryParam of queryParams) {
-          const content: ContentObject = {
-            'text/plain': { example: { value: BuildQueryString(queryParam) } }
-          }
-          parameters.push({ name: queryParam.key, in: 'query', content })
+          const exampleValue = BuildQueryString(queryParam)
+          parameters.push({ name: queryParam.key, in: 'query', schema, example: exampleValue })
         }
       } else {
-        const content: ContentObject = {
-          'text/plain': { example: { value: BuildQueryString(queryParams) } }
-        }
-        parameters.push({ name: queryParams.key, in: 'query', content })
+        const exampleValue = BuildQueryString(queryParams)
+        parameters.push({ name: queryParams.key, in: 'query', schema, example: exampleValue })
       }
     }
 
@@ -225,24 +224,25 @@ export class AilFactory {
     const formattedHeaders: ParameterObject[] = Object.keys(headers)
       .filter(header => !FILTERED_HEADERS.includes(header))
       .map(header => {
+        const exampleValue = SimpleParameterString(headers[header])
+        const schema: SchemaObject = { type: 'string' }
+
         if (headerDetails && headerDetails[header]) {
           const { value, ...options } = headerDetails[header]
           return {
             name: header,
             in: 'header' as ParameterLocation,
-            example: SimpleParameterString(headers[header]),
+            schema,
+            example: exampleValue,
             ...options
           }
-        }
-
-        const content: ContentObject = {
-          'text/plain': { example: { value: SimpleParameterString(headers[header]) } }
         }
 
         return {
           name: header,
           in: 'header' as ParameterLocation,
-          content
+          schema,
+          example: exampleValue
         }
       })
 
