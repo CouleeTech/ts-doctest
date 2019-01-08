@@ -1,6 +1,6 @@
 {
   "name": "ts-doctest",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "combines api tests with documentation generation",
   "keywords": [
     "cli",
