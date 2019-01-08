@@ -7,7 +7,8 @@ import { AilFactoryException } from '../../Back-End/Exceptions/Ail.Factory.Excep
 import { invalidRawData, validRawData, validRawApiResponse } from '../Payloads/RawApi.Payloads'
 
 class MockAilFactory extends AilFactory {
-  public static rawToAil = (path: string, rawData: RawDocData[]) => MockAilFactory.RawPathToAil(path, rawData)
+  public static rawToAil = (path: string, rawData: RawDocData[]) =>
+    MockAilFactory.RawPathToAil(path, rawData, { description: '' })
   public static validateRawDataInTest = (path: string, rawData: RawDocData[]) =>
     MockAilFactory.ValidateRawData(path, rawData)
 }

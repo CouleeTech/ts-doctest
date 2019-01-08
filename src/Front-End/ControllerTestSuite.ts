@@ -29,15 +29,13 @@ export interface IPathConfig {
   templates?: string[]
 }
 
-export interface IOperationTemplates {
-  [key: string]: any
-}
+export type OperationTemplates = Record<string, any>
 
 export interface IOperationConfig {
   name: string
   description?: string
   query?: QueryStringConfig
-  templates?: IOperationTemplates
+  templates?: OperationTemplates
 }
 
 /**
@@ -114,14 +112,11 @@ export abstract class ControllerTestSuite {
                   throw new Error(`The ${name} operation on the ${path.name} path provided no template values.`)
                 }
 
-                for (const template of path.templates) {
-                  if (!config.templates[template]) {
-                    throw new Error(
-                      `The ${name} operation on the ${path.name} path is missing a template value for {${template}}.`
-                    )
-                  }
-                  templatedPathName = path.name.replace(`{${template}}`, config.templates[template])
-                }
+                templatedPathName = ControllerTestSuite.FillPathStringWithTemplates(
+                  path.name,
+                  path.templates,
+                  config.templates
+                )
               }
 
               const pathName = config.query
@@ -236,18 +231,37 @@ export abstract class ControllerTestSuite {
    *
    * @param name: The name of the controller's path
    */
-  private static CheckForPathTemplates(name: string): string[] | null {
+  protected static CheckForPathTemplates(name: string): string[] | null {
     return name.match(/((?<=\{)\w+(?=\}))/g)
+  }
+
+  protected static FillPathStringWithTemplates(
+    pathName: string,
+    pathTemplates: string[],
+    operationTemplates: OperationTemplates
+  ) {
+    let templatedPathName = pathName
+
+    for (const template of pathTemplates) {
+      if (!operationTemplates[template]) {
+        throw new Error(`The ${name} operation on the ${pathName} path is missing a template value for {${template}}.`)
+      }
+      templatedPathName = templatedPathName.replace(`{${template}}`, operationTemplates[template])
+    }
+
+    return templatedPathName
   }
 }
 
 export type ResponseGenerator = (req: any) => () => Promise<Response>
+
 export interface IPathOperation {
   config: IOperationConfig
   generator: ResponseGenerator
 }
 
 export type TestSetContents = [HttpRequestMethod, string, IPathOperation]
+
 export type TestSet = Set<TestSetContents>
 
 /**
@@ -274,7 +288,7 @@ export class TestSuitePath {
 
   public get(
     config: IOperationConfig | string,
-    second: IOperationTemplates | ResponseGenerator,
+    second: OperationTemplates | ResponseGenerator,
     third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.GET, config, second, third)
@@ -282,7 +296,7 @@ export class TestSuitePath {
 
   public post(
     config: IOperationConfig | string,
-    second: IOperationTemplates | ResponseGenerator,
+    second: OperationTemplates | ResponseGenerator,
     third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.POST, config, second, third)
@@ -290,7 +304,7 @@ export class TestSuitePath {
 
   public put(
     config: IOperationConfig | string,
-    second: IOperationTemplates | ResponseGenerator,
+    second: OperationTemplates | ResponseGenerator,
     third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.PUT, config, second, third)
@@ -298,7 +312,7 @@ export class TestSuitePath {
 
   public delete(
     config: IOperationConfig | string,
-    second: IOperationTemplates | ResponseGenerator,
+    second: OperationTemplates | ResponseGenerator,
     third?: ResponseGenerator
   ) {
     return this.operation(HttpRequestMethods.DELETE, config, second, third)
@@ -362,7 +376,7 @@ export class TestSuitePath {
   private operation(
     type: HttpRequestMethods,
     config: IOperationConfig | string,
-    second: IOperationTemplates | ResponseGenerator,
+    second: OperationTemplates | ResponseGenerator,
     third?: ResponseGenerator
   ) {
     if (IsString(config)) {
