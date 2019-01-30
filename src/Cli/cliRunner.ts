@@ -1,4 +1,4 @@
-import { spawn, fork } from 'child_process'
+import { spawn, fork, ChildProcess } from 'child_process'
 
 import { AilGatherer } from '../Back-End/Ail.Gatherer'
 import { IAilCollection } from '../Back-End/Interfaces/Ail.Interfaces'
@@ -39,6 +39,7 @@ export interface ILogger {
 }
 
 let testsAreAbleToRun = true
+let sideApp: ChildProcess | null = null
 
 export class FatalError extends Error {
   public static NAME = 'FatalError'
@@ -122,10 +123,16 @@ async function runTests(logger: ILogger, doctestConfig: IDoctestConfig, noCache:
 
   runner.on('exit', async code => {
     if (code !== 0) {
+      if (sideApp) {
+        sideApp.kill('SIGINT')
+      }
       throw new FatalError(`Testing Failed.`)
     } else {
-      logger.log('Testing Complete. Generating Documentation.\n')
+      if (sideApp) {
+        sideApp.kill('SIGINT')
+      }
 
+      logger.log('Testing Complete. Generating Documentation.\n')
       const collection: IAilCollection = await AilGatherer.Gather(doctestConfig)
       await OutputGenerator.GenerateOutput(doctestConfig, collection)
       return { results, stdout: stdout.join('') }
@@ -137,7 +144,7 @@ function startSideApplication(path: string) {
   testsAreAbleToRun = false
   const fullPath = GetFullPath(path)
   VerifyFileExistsSync(fullPath, `Could not find the following side application: ${fullPath}`)
-  const sideApp = fork(fullPath)
+  sideApp = fork(fullPath)
   sideApp.on('message', message => handleSideApplicationMessage(message))
 }
 
