@@ -46,8 +46,8 @@ export interface IOperationConfig {
  * To initiate the test suite create a trigger function using the `build` method.
  */
 export abstract class ControllerTestSuite {
-  private app: IApplication
-  private appBuilder: () => Promise<IApplication>
+  private app: IApplication | string
+  private appBuilder: () => Promise<IApplication | string>
   private controller: string
   private paths: Map<string, TestSuitePath>
   private resultContainer: RawDocContainer
@@ -96,7 +96,10 @@ export abstract class ControllerTestSuite {
           this.app = await this.appBuilder()
           AilManager.Init()
           await this.beforeAll()
-          await this.app.init()
+
+          if (!IsString(this.app)) {
+            await this.app.init()
+          }
         })
 
         for (const path of this.paths.values()) {
@@ -163,7 +166,10 @@ export abstract class ControllerTestSuite {
 
         afterAll(async () => {
           await this.afterAll()
-          await this.app.close()
+
+          if (!IsString(this.app)) {
+            await this.app.close()
+          }
 
           for (const reqWrapper of this.requestWrappers.values()) {
             const rawDocs: RawDocData = reqWrapper.exportRequestDocs()
@@ -218,7 +224,8 @@ export abstract class ControllerTestSuite {
     if (!this.app) {
       throw new Error(`Tried to access an httpServer on a ${this.controller} ControllerTestSuite with no app object.`)
     }
-    return this.app.getHttpServer()
+
+    return IsString(this.app) ? this.app : this.app.getHttpServer()
   }
 
   // ~~~ Private :: Helper Methods ~~~ //
