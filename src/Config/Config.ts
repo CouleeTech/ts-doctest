@@ -15,7 +15,7 @@ export enum AilStorageEngineType {
  */
 export enum OutputFormat {
   SWAGGER = 'swagger',
-  SPHINX = 'sphnix'
+  SPHINX = 'sphinx'
 }
 
 /**
@@ -24,6 +24,11 @@ export enum OutputFormat {
 export interface IDoctestConfig {
   storageEngine: AilStorageEngineType
   resultsDirectory: string
+
+  /**
+   * Include a path to an application to fork before running tests
+   */
+  appPath?: string
   ailVersion?: string
   openApiVersion?: string
   outputFormats: OutputFormat[]

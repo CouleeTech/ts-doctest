@@ -1,4 +1,4 @@
-import { spawn } from 'child_process'
+import { spawn, fork } from 'child_process'
 
 import { AilGatherer } from '../Back-End/Ail.Gatherer'
 import { IAilCollection } from '../Back-End/Interfaces/Ail.Interfaces'
@@ -67,6 +67,9 @@ async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
   )
 
   const doctestConfig: IDoctestConfig = await GetJsonFile<IDoctestConfig>(doctestConfigPath)
+
+  if (doctestConfig.appPath) startSideApplication
+
   const noCache = options.noCache ? options.noCache : false
 
   if (options.jestConfig) {
@@ -118,4 +121,10 @@ async function runTests(logger: ILogger, doctestConfig: IDoctestConfig, noCache:
       return { results, stdout: stdout.join('') }
     }
   })
+}
+
+function startSideApplication(path: string) {
+  const fullPath = GetFullPath(path)
+  VerifyFileExistsSync(fullPath, `Could not find the following side application: ${fullPath}`)
+  fork(fullPath)
 }
