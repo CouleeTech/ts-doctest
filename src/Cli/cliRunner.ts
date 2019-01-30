@@ -38,6 +38,8 @@ export interface ILogger {
   error(message: string): void
 }
 
+let testsAreAbleToRun = true
+
 export class FatalError extends Error {
   public static NAME = 'FatalError'
   constructor(public message: string, public innerError?: Error) {
@@ -68,21 +70,29 @@ async function runWorker(options: IOptions, logger: ILogger): Promise<Status> {
 
   const doctestConfig: IDoctestConfig = await GetJsonFile<IDoctestConfig>(doctestConfigPath)
 
-  if (doctestConfig.appPath) startSideApplication
+  if (doctestConfig.appPath) startSideApplication(doctestConfig.appPath)
 
   const noCache = options.noCache ? options.noCache : false
 
+  let jestConfigPath
+
   if (options.jestConfig) {
-    const jestConfigPath = GetFullPath(options.jestConfig)
+    jestConfigPath = GetFullPath(options.jestConfig)
     VerifyFileExistsSync(
       jestConfigPath,
       `Invalid path for the jest configuration file. File not found: ${jestConfigPath}`
     )
-    await runTests(logger, doctestConfig, noCache, jestConfigPath)
-  } else {
-    await runTests(logger, doctestConfig, noCache)
   }
 
+  const startTime = Date.now()
+
+  while (!testsAreAbleToRun) {
+    await timer(500)
+    const currentTime = Date.now()
+    console.log(`Waiting to run tests.. ${(currentTime - startTime) / 1000} seconds`)
+  }
+
+  await runTests(logger, doctestConfig, noCache, jestConfigPath)
   return Status.Ok
 }
 
@@ -124,7 +134,19 @@ async function runTests(logger: ILogger, doctestConfig: IDoctestConfig, noCache:
 }
 
 function startSideApplication(path: string) {
+  testsAreAbleToRun = false
   const fullPath = GetFullPath(path)
   VerifyFileExistsSync(fullPath, `Could not find the following side application: ${fullPath}`)
-  fork(fullPath)
+  const sideApp = fork(fullPath)
+  sideApp.on('message', message => handleSideApplicationMessage(message))
+}
+
+function timer(ms: number) {
+  return new Promise(res => setTimeout(res, ms))
+}
+
+function handleSideApplicationMessage(message: any) {
+  if (message.type && message.type === 'BEGIN_TESTING') {
+    testsAreAbleToRun = true
+  }
 }
